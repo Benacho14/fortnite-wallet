@@ -1,5 +1,5 @@
 // frontend/js/auth.js
-const API_URL = 'https://fortnite-wallet.onrender.com';
+const API_URL = 'https://fortnite-wallet.onrender.com/api';
 
 // Elementos del DOM
 const loginForm = document.getElementById('loginForm');

@@ -1,5 +1,5 @@
 // frontend/js/admin.js
-const API_URL = 'https://fortnite-wallet.onrender.com';
+const API_URL = 'https://fortnite-wallet.onrender.com/api';
 
 const token = localStorage.getItem('token');
 if (!token) {
