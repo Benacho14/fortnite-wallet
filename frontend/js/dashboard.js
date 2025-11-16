@@ -1,5 +1,5 @@
 // frontend/js/dashboard.js
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'https://fortnite-wallet.onrender.com';
 
 // Verificar autenticación
 const token = localStorage.getItem('token');
