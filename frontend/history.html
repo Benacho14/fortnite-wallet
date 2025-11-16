@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Historial - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎮 FORTNITE WALLET</h1>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="transfer.html">Transferir</a>
+        <a href="shop.html">Tienda</a>
+        <a href="history.html" class="active">Historial</a>
+        <a href="admin.html">Admin Panel</a>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="history-header">
+      <h2>📜 Historial de Transacciones</h2>
+      <div class="balance-mini">
+        <span class="vbucks-icon">💎</span>
+        <span id="balance">0</span> V-Bucks
+      </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="card">
+      <div class="card-body">
+        <div class="filters-row">
+          <div class="filter-group">
+            <label>Filtrar por tipo:</label>
+            <select id="typeFilter" class="filter-select">
+              <option value="all">Todas las transacciones</option>
+              <option value="recharge">💰 Recargas</option>
+              <option value="purchase">🛒 Compras</option>
+              <option value="sale">💵 Ventas</option>
+              <option value="transfer_sent">📤 Transferencias enviadas</option>
+              <option value="transfer_received">📥 Transferencias recibidas</option>
+              <option value="admin_modification">⚙️ Modificaciones Admin</option>
+            </select>
+          </div>
+
+          <div class="filter-group">
+            <label>Ordenar por:</label>
+            <select id="sortFilter" class="filter-select">
+              <option value="newest">Más recientes</option>
+              <option value="oldest">Más antiguas</option>
+              <option value="highest">Mayor monto</option>
+              <option value="lowest">Menor monto</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Resumen de transacciones -->
+    <div class="summary-grid">
+      <div class="summary-card income">
+        <div class="summary-icon">📈</div>
+        <div class="summary-info">
+          <h4>Total Recibido</h4>
+          <p class="summary-amount" id="totalIncome">0</p>
+        </div>
+      </div>
+
+      <div class="summary-card expense">
+        <div class="summary-icon">📉</div>
+        <div class="summary-info">
+          <h4>Total Gastado</h4>
+          <p class="summary-amount" id="totalExpense">0</p>
+        </div>
+      </div>
+
+      <div class="summary-card transactions">
+        <div class="summary-icon">📊</div>
+        <div class="summary-info">
+          <h4>Total Transacciones</h4>
+          <p class="summary-amount" id="totalTransactions">0</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Lista de transacciones -->
+    <div class="card">
+      <div class="card-header">
+        <h3>📋 Todas las Transacciones</h3>
+      </div>
+      <div class="card-body">
+        <div id="transactionsList" class="transactions-list-detailed">
+          <p class="loading">Cargando historial...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Paginación -->
+    <div id="pagination" class="pagination hidden">
+      <button id="prevPage" class="btn-page">← Anterior</button>
+      <span id="pageInfo">Página 1 de 1</span>
+      <button id="nextPage" class="btn-page">Siguiente →</button>
+    </div>
+  </div>
+
+  <script src="js/history.js"></script>
+</body>
+</html>

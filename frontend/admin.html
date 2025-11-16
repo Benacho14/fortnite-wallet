@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panel Admin - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎮 FORTNITE WALLET - ADMIN</h1>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="shop.html">Tienda</a>
+        <a href="history.html">Historial</a>
+        <a href="admin.html" class="active">Admin Panel</a>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="welcome-section">
+      <h2>👑 Panel de Administración</h2>
+      <p>Gestiona usuarios y transacciones</p>
+    </div>
+
+    <!-- Usuarios -->
+    <div class="card">
+      <div class="card-header">
+        <h3>👥 Usuarios Registrados</h3>
+      </div>
+      <div class="card-body">
+        <div id="usersList" class="admin-list">
+          <p class="loading">Cargando usuarios...</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Todas las transacciones -->
+    <div class="card">
+      <div class="card-header">
+        <h3>📊 Todas las Transacciones</h3>
+      </div>
+      <div class="card-body">
+        <div id="allTransactions" class="transactions-list">
+          <p class="loading">Cargando transacciones...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para modificar saldo -->
+  <div id="modifyModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>💰 Modificar Saldo</h3>
+      <p>Usuario: <span id="modalUsername"></span></p>
+      <p>Saldo actual: <span id="modalCurrentBalance"></span> V-Bucks</p>
+      <input type="number" id="modalNewBalance" placeholder="Nuevo saldo">
+      <div class="modal-buttons">
+        <button id="confirmModify" class="btn-primary">Confirmar</button>
+        <button id="cancelModify" class="btn-logout">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden"></div>
+
+  <script src="js/admin.js"></script>
+</body>
+</html>

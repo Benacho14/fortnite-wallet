@@ -1,0 +1,434 @@
+[
+  {
+    "id": "1763252111361",
+    "userId": "1763238180675",
+    "type": "transfer_sent",
+    "amount": -500,
+    "description": "Transferencia enviada a Benacho",
+    "recipientEmail": "beniaconis@gmail.com",
+    "date": "2025-11-16T00:15:11.394Z"
+  },
+  {
+    "id": "1763252111396",
+    "userId": "1763239517716",
+    "type": "transfer_received",
+    "amount": 500,
+    "description": "Transferencia recibida de Admin Tester",
+    "senderEmail": "admin@fortnite.com",
+    "date": "2025-11-16T00:15:11.395Z"
+  },
+  {
+    "id": "1763252125407",
+    "userId": "1763238180675",
+    "type": "transfer_sent",
+    "amount": -500,
+    "description": "Transferencia enviada a Benacho",
+    "recipientEmail": "beniaconis@gmail.com",
+    "date": "2025-11-16T00:15:25.407Z"
+  },
+  {
+    "id": "1763252125408",
+    "userId": "1763239517716",
+    "type": "transfer_received",
+    "amount": 500,
+    "description": "Transferencia recibida de Admin Tester",
+    "senderEmail": "admin@fortnite.com",
+    "date": "2025-11-16T00:15:25.407Z"
+  },
+  {
+    "id": "1763252134942",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:34.942Z"
+  },
+  {
+    "id": "1763252136066",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.066Z"
+  },
+  {
+    "id": "1763252136324",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.324Z"
+  },
+  {
+    "id": "1763252136454",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.454Z"
+  },
+  {
+    "id": "1763252136623",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.623Z"
+  },
+  {
+    "id": "1763252136792",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.792Z"
+  },
+  {
+    "id": "1763252136975",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:15:36.975Z"
+  },
+  {
+    "id": "1763252215663",
+    "userId": "1763239517716",
+    "type": "admin_modification",
+    "amount": -1000,
+    "description": "Modificación de admin: 2000 → 1000 V-Bucks",
+    "date": "2025-11-16T00:16:55.663Z"
+  },
+  {
+    "id": "1763252234441",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:14.441Z"
+  },
+  {
+    "id": "1763252235109",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:15.109Z"
+  },
+  {
+    "id": "1763252235419",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:15.419Z"
+  },
+  {
+    "id": "1763252235748",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:15.748Z"
+  },
+  {
+    "id": "1763252236046",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:16.046Z"
+  },
+  {
+    "id": "1763252236326",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:16.326Z"
+  },
+  {
+    "id": "1763252236718",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:16.718Z"
+  },
+  {
+    "id": "1763252236914",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:16.914Z"
+  },
+  {
+    "id": "1763252237103",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:17.103Z"
+  },
+  {
+    "id": "1763252237308",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:17.308Z"
+  },
+  {
+    "id": "1763252237571",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:17.571Z"
+  },
+  {
+    "id": "1763252237851",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:17.851Z"
+  },
+  {
+    "id": "1763252238222",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:18.222Z"
+  },
+  {
+    "id": "1763252238639",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:18.639Z"
+  },
+  {
+    "id": "1763252238995",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:18.995Z"
+  },
+  {
+    "id": "1763252239257",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:19.257Z"
+  },
+  {
+    "id": "1763252239486",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:19.486Z"
+  },
+  {
+    "id": "1763252239691",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:19.691Z"
+  },
+  {
+    "id": "1763252239869",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:19.869Z"
+  },
+  {
+    "id": "1763252240046",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.046Z"
+  },
+  {
+    "id": "1763252240206",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.206Z"
+  },
+  {
+    "id": "1763252240377",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.377Z"
+  },
+  {
+    "id": "1763252240569",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.569Z"
+  },
+  {
+    "id": "1763252240746",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.747Z"
+  },
+  {
+    "id": "1763252240928",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:20.928Z"
+  },
+  {
+    "id": "1763252241121",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:21.121Z"
+  },
+  {
+    "id": "1763252241345",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:21.345Z"
+  },
+  {
+    "id": "1763252241707",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:21.707Z"
+  },
+  {
+    "id": "1763252242765",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:17:22.765Z"
+  },
+  {
+    "id": "1763252255417",
+    "userId": "1763238180675",
+    "type": "admin_modification",
+    "amount": -500,
+    "description": "Modificación de admin: 1000499 → 999999 V-Bucks",
+    "date": "2025-11-16T00:17:35.417Z"
+  },
+  {
+    "id": "1763254346935",
+    "userId": "1763238180675",
+    "type": "purchase",
+    "amount": -599,
+    "productId": "1763254329923",
+    "productName": "aaa",
+    "quantity": 1,
+    "sellerId": "1763239517716",
+    "description": "Compra: 1x aaa",
+    "date": "2025-11-16T00:52:26.935Z"
+  },
+  {
+    "id": "1763254346936",
+    "userId": "1763239517716",
+    "type": "sale",
+    "amount": 599,
+    "productId": "1763254329923",
+    "productName": "aaa",
+    "quantity": 1,
+    "buyerId": "1763238180675",
+    "description": "Venta: 1x aaa",
+    "date": "2025-11-16T00:52:26.935Z"
+  },
+  {
+    "id": "1763254418270",
+    "userId": "1763239517716",
+    "type": "transfer_sent",
+    "amount": -599,
+    "description": "Transferencia enviada a Admin Tester",
+    "recipientEmail": "admin@fortnite.com",
+    "date": "2025-11-16T00:53:38.270Z"
+  },
+  {
+    "id": "1763254418271",
+    "userId": "1763238180675",
+    "type": "transfer_received",
+    "amount": 599,
+    "description": "Transferencia recibida de Benacho",
+    "senderEmail": "beniaconis@gmail.com",
+    "date": "2025-11-16T00:53:38.270Z"
+  },
+  {
+    "id": "1763254510842",
+    "userId": "1763239517716",
+    "type": "transfer_sent",
+    "amount": -500,
+    "description": "Transferencia enviada a Admin Tester",
+    "recipientEmail": "admin@fortnite.com",
+    "date": "2025-11-16T00:55:10.842Z"
+  },
+  {
+    "id": "1763254510843",
+    "userId": "1763238180675",
+    "type": "transfer_received",
+    "amount": 500,
+    "description": "Transferencia recibida de Benacho",
+    "senderEmail": "beniaconis@gmail.com",
+    "date": "2025-11-16T00:55:10.842Z"
+  },
+  {
+    "id": "1763254606852",
+    "userId": "1763239517716",
+    "type": "admin_modification",
+    "amount": 500,
+    "description": "Modificación de admin: 500 → 1000 V-Bucks",
+    "date": "2025-11-16T00:56:46.852Z"
+  },
+  {
+    "id": "1763254631539",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:57:11.539Z"
+  },
+  {
+    "id": "1763254632659",
+    "userId": "1763238180675",
+    "type": "recharge",
+    "amount": 1000,
+    "description": "Recarga de 1000 V-Bucks",
+    "date": "2025-11-16T00:57:12.659Z"
+  },
+  {
+    "id": "1763254646417",
+    "userId": "1763238180675",
+    "type": "admin_modification",
+    "amount": -1002498,
+    "description": "Modificación de admin: 1002499 → 1 V-Bucks",
+    "date": "2025-11-16T00:57:26.417Z"
+  }
+]

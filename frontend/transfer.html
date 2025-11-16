@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transferir - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎮 FORTNITE WALLET</h1>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="transfer.html" class="active">Transferir</a>
+        <a href="shop.html">Tienda</a>
+        <a href="history.html">Historial</a>
+        <a href="admin.html">Admin Panel</a>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="transfer-header">
+      <h2>💸 Transferir V-Bucks</h2>
+      <div class="balance-mini">
+        <span class="vbucks-icon">💎</span>
+        <span id="balance">0</span> V-Bucks
+      </div>
+    </div>
+
+    <div class="transfer-grid">
+      <!-- Formulario de transferencia -->
+      <div class="card">
+        <div class="card-header">
+          <h3>📤 Enviar V-Bucks</h3>
+        </div>
+        <div class="card-body">
+          <form id="transferForm">
+            <div class="form-group">
+              <label>Usuario seleccionado:</label>
+              <input type="text" id="selectedUserDisplay" readonly placeholder="Selecciona un usuario de la lista">
+              <input type="hidden" id="selectedUserEmail">
+            </div>
+            
+            <div class="form-group">
+              <label>Cantidad a transferir:</label>
+              <input type="number" id="transferAmount" placeholder="Ejemplo: 500" min="1" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Transferir V-Bucks</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Lista de usuarios -->
+      <div class="card">
+        <div class="card-header">
+          <h3>👥 Seleccionar Usuario</h3>
+        </div>
+        <div class="card-body">
+          <div id="usersList" class="users-list-transfer">
+            <p class="loading">Cargando usuarios...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden"></div>
+
+  <script src="js/transfer.js"></script>
+</body>
+</html>

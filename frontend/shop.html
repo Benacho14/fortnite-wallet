@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎮 FORTNITE WALLET</h1>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="transfer.html">Transferir</a>
+        <a href="shop.html" class="active">Tienda</a>
+        <a href="history.html">Historial</a>
+        <a href="admin.html">Admin Panel</a>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Header con balance y botón de mi negocio -->
+    <div class="shop-header">
+      <h2>🛍️ Marketplace</h2>
+      <div style="display: flex; gap: 1rem; align-items: center;">
+        <div class="balance-mini">
+          <span class="vbucks-icon">💎</span>
+          <span id="balance">0</span> V-Bucks
+        </div>
+        <button id="myBusinessBtn" class="btn-primary">Mi Negocio</button>
+      </div>
+    </div>
+
+    <!-- Tabs de navegación -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="explore">🔍 Explorar Negocios</button>
+      <button class="tab-btn" data-tab="mybusiness">🏪 Mi Negocio</button>
+    </div>
+
+    <!-- TAB 1: Explorar Negocios -->
+    <div id="exploreTab" class="tab-content active">
+      <div class="section-header">
+        <h3>Negocios Disponibles</h3>
+        <select id="categoryFilter" class="filter-select">
+          <option value="all">Todas las categorías</option>
+          <option value="comida">🍕 Comida</option>
+          <option value="ropa">👕 Ropa</option>
+          <option value="tecnologia">💻 Tecnología</option>
+          <option value="juegos">🎮 Juegos</option>
+          <option value="servicios">⚙️ Servicios</option>
+          <option value="otros">📦 Otros</option>
+        </select>
+      </div>
+
+      <div id="businessList" class="business-grid">
+        <p class="loading">Cargando negocios...</p>
+      </div>
+    </div>
+
+    <!-- TAB 2: Mi Negocio -->
+    <div id="mybusinessTab" class="tab-content">
+      <!-- Si no tiene negocio -->
+      <div id="noBusinessSection" class="card">
+        <div class="card-body" style="text-align: center; padding: 3rem;">
+          <h3>🏪 Crea tu Negocio</h3>
+          <p style="color: var(--text-secondary); margin: 1rem 0;">Empieza a vender tus productos y gana V-Bucks</p>
+          
+          <form id="createBusinessForm" style="max-width: 500px; margin: 2rem auto;">
+            <div class="form-group">
+              <label>Nombre del Negocio:</label>
+              <input type="text" id="businessName" placeholder="Ej: Pizzería Mario" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Descripción:</label>
+              <textarea id="businessDescription" placeholder="Describe tu negocio..." rows="3" required></textarea>
+            </div>
+            
+            <div class="form-group">
+              <label>Categoría:</label>
+              <select id="businessCategory" required>
+                <option value="">Selecciona una categoría</option>
+                <option value="comida">🍕 Comida</option>
+                <option value="ropa">👕 Ropa</option>
+                <option value="tecnologia">💻 Tecnología</option>
+                <option value="juegos">🎮 Juegos</option>
+                <option value="servicios">⚙️ Servicios</option>
+                <option value="otros">📦 Otros</option>
+              </select>
+            </div>
+
+            <button type="submit" class="btn-primary">Crear Negocio</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Si tiene negocio -->
+<div id="hasBusinessSection" class="hidden">
+    <div class="card">
+      <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 id="myBusinessName">Mi Negocio</h3>
+        <div style="display: flex; gap: 0.5rem;">
+          <button id="editBusinessBtn" class="btn-edit">✏️ Editar</button>
+          <button id="deleteBusinessBtn" class="btn-delete-small">🗑️ Eliminar</button>
+        </div>
+      </div>
+      <div class="card-body">
+        <p id="myBusinessDescription"></p>
+        <p><strong>Categoría:</strong> <span id="myBusinessCategory"></span></p>
+      </div>
+    </div>
+  
+    <!-- Agregar producto -->
+    <div class="card">
+      <div class="card-header">
+        <h3>➕ Agregar Producto</h3>
+      </div>
+      <div class="card-body">
+        <form id="addProductForm">
+          <div class="form-row">
+            <div class="form-group">
+              <label>Nombre del Producto:</label>
+              <input type="text" id="productName" placeholder="Ej: Pizza Margarita" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Precio (V-Bucks):</label>
+              <input type="number" id="productPrice" placeholder="500" min="1" required>
+            </div>
+          </div>
+  
+          <div class="form-group">
+            <label>Descripción:</label>
+            <textarea id="productDescription" placeholder="Describe tu producto..." rows="2" required></textarea>
+          </div>
+  
+          <div class="form-group">
+            <label>Emoji/Icono:</label>
+            <input type="text" id="productImage" placeholder="🍕" maxlength="2">
+          </div>
+  
+          <button type="submit" class="btn-primary">Agregar Producto</button>
+        </form>
+      </div>
+    </div>
+  
+    <!-- Mis productos -->
+    <div class="card">
+      <div class="card-header">
+        <h3>📦 Mis Productos</h3>
+      </div>
+      <div class="card-body">
+        <div id="myProductsList" class="products-grid">
+          <p class="loading">Cargando tus productos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+        <!-- Agregar producto -->
+        <div class="card">
+          <div class="card-header">
+            <h3>➕ Agregar Producto</h3>
+          </div>
+          <div class="card-body">
+            <form id="addProductForm">
+              <div class="form-row">
+                <div class="form-group">
+                  <label>Nombre del Producto:</label>
+                  <input type="text" id="productName" placeholder="Ej: Pizza Margarita" required>
+                </div>
+                
+                <div class="form-group">
+                  <label>Precio (V-Bucks):</label>
+                  <input type="number" id="productPrice" placeholder="500" min="1" required>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label>Descripción:</label>
+                <textarea id="productDescription" placeholder="Describe tu producto..." rows="2" required></textarea>
+              </div>
+
+              <div class="form-group">
+                <label>Emoji/Icono:</label>
+                <input type="text" id="productImage" placeholder="🍕" maxlength="2">
+              </div>
+
+              <button type="submit" class="btn-primary">Agregar Producto</button>
+            </form>
+          </div>
+        </div>
+
+        <!-- Mis productos -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📦 Mis Productos</h3>
+          </div>
+          <div class="card-body">
+            <div id="myProductsList" class="products-grid">
+              <p class="loading">Cargando tus productos...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para ver productos de un negocio -->
+  <div id="productsModal" class="modal hidden">
+    <div class="modal-content-large">
+      <div class="modal-header">
+        <h3 id="modalBusinessName">Negocio</h3>
+        <button id="closeModal" class="close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div id="modalProductsList" class="products-grid">
+          <p class="loading">Cargando productos...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para editar negocio -->
+<div id="editBusinessModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>✏️ Editar Negocio</h3>
+      <form id="editBusinessForm">
+        <div class="form-group">
+          <label>Nombre del Negocio:</label>
+          <input type="text" id="editBusinessName" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea id="editBusinessDescription" rows="3" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Categoría:</label>
+          <select id="editBusinessCategory" required>
+            <option value="comida">🍕 Comida</option>
+            <option value="ropa">👕 Ropa</option>
+            <option value="tecnologia">💻 Tecnología</option>
+            <option value="juegos">🎮 Juegos</option>
+            <option value="servicios">⚙️ Servicios</option>
+            <option value="otros">📦 Otros</option>
+          </select>
+        </div>
+  
+        <div class="modal-buttons">
+          <button type="submit" class="btn-primary">Guardar Cambios</button>
+          <button type="button" id="cancelEditBusiness" class="btn-logout">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <!-- Modal para editar producto -->
+  <div id="editProductModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>✏️ Editar Producto</h3>
+      <form id="editProductForm">
+        <input type="hidden" id="editProductId">
+        
+        <div class="form-group">
+          <label>Nombre del Producto:</label>
+          <input type="text" id="editProductName" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Precio (V-Bucks):</label>
+          <input type="number" id="editProductPrice" min="1" required>
+        </div>
+        
+        <div class="form-group">
+          <label>Descripción:</label>
+          <textarea id="editProductDescription" rows="2" required></textarea>
+        </div>
+        
+        <div class="form-group">
+          <label>Emoji/Icono:</label>
+          <input type="text" id="editProductImage" maxlength="2">
+        </div>
+  
+        <div class="modal-buttons">
+          <button type="submit" class="btn-primary">Guardar Cambios</button>
+          <button type="button" id="cancelEditProduct" class="btn-logout">Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden"></div>
+
+  <script src="js/shop.js"></script>
+</body>
+</html>

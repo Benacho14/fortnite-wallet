@@ -1,0 +1,19 @@
+[
+  {
+    "id": "1763238180675",
+    "email": "admin@fortnite.com",
+    "username": "Admin Tester",
+    "password": "$2a$10$dr2Prnylr/RujAXEKeCkBO8Rj1iYXHz1l.fVsJfdZFWf0WvBhpoHC",
+    "balance": 1,
+    "isAdmin": true,
+    "createdAt": "2025-11-15T20:23:00.676Z"
+  },
+  {
+    "id": "1763239517716",
+    "email": "beniaconis@gmail.com",
+    "username": "Benacho",
+    "password": "$2a$10$.vnYERKzY.V55rZUZsyy8etNIX465dqutzCrucFq.YtLs0V9R5xiS",
+    "balance": 1000,
+    "createdAt": "2025-11-15T20:45:17.716Z"
+  }
+]

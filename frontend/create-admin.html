@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Crear Admin - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <div class="logo">
+        <h1>🎮 FORTNITE WALLET</h1>
+        <p>Crear Usuario Administrador</p>
+      </div>
+
+      <div style="text-align: center; margin: 2rem 0;">
+        <button id="createAdmin" class="btn-primary">Crear Cuenta Admin</button>
+      </div>
+
+      <div id="result" style="margin-top: 2rem;"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('createAdmin').onclick = async () => {
+      const btn = document.getElementById('createAdmin');
+      btn.disabled = true;
+      btn.textContent = 'Creando...';
+
+      try {
+        const response = await fetch('http://localhost:3000/api/auth/create-admin', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'}
+        });
+        
+        const data = await response.json();
+        
+        if (response.ok) {
+          document.getElementById('result').innerHTML = `
+            <div style="background: rgba(74, 222, 128, 0.2); border: 2px solid #4ade80; padding: 1.5rem; border-radius: 10px; text-align: center;">
+              <h2 style="color: #4ade80; margin-bottom: 1rem;">✅ Admin creado exitosamente!</h2>
+              <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>Email:</strong> admin@fortnite.com</p>
+              <p style="font-size: 1.1rem; margin: 0.5rem 0;"><strong>Password:</strong> admin123</p>
+              <a href="index.html" class="btn-primary" style="display: inline-block; margin-top: 1rem; text-decoration: none;">Ir a Login</a>
+            </div>
+          `;
+        } else {
+          document.getElementById('result').innerHTML = `
+            <div class="error-message">
+              ❌ ${data.error}
+            </div>
+          `;
+          btn.disabled = false;
+          btn.textContent = 'Crear Cuenta Admin';
+        }
+      } catch (error) {
+        document.getElementById('result').innerHTML = `
+          <div class="error-message">
+            ❌ Error de conexión. Verifica que el servidor esté corriendo.
+          </div>
+        `;
+        btn.disabled = false;
+        btn.textContent = 'Crear Cuenta Admin';
+      }
+    };
+  </script>
+</body>
+</html>
+```
+
+4. **Guarda el archivo** (Ctrl + S)
+
+---
+
+## 🎯 **PASO 2: Ahora sí, crear el admin**
+
+1. **Ve a tu navegador**
+2. **Escribe:**
+```
+   http://localhost:3000/create-admin.html
+```
+3. **Click en "Crear Cuenta Admin"**
+4. **Deberías ver el mensaje de éxito con las credenciales**
+
+---
+
+## 🎮 **PASO 3: Iniciar sesión**
+
+1. **Click en "Ir a Login"**
+2. **Inicia sesión con:**
+```
+   Email: admin@fortnite.com
+   Password: admin123
+```
+
+---
+
+## 👑 **PASO 4: Ir al panel admin**
+
+Una vez logueado, escribe en la barra:
+```
+http://localhost:3000/admin.html

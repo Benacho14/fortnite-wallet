@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fortnite Wallet - Login</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="auth-container">
+    <div class="auth-box">
+      <div class="logo">
+        <h1>🎮 FORTNITE WALLET</h1>
+        <p>Tu billetera virtual de V-Bucks</p>
+      </div>
+
+      <!-- Login Form -->
+      <form id="loginForm" class="auth-form">
+        <h2>Iniciar Sesión</h2>
+        <div class="form-group">
+          <input type="email" id="loginEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="loginPassword" placeholder="Contraseña" required>
+        </div>
+        <button type="submit" class="btn-primary">Ingresar</button>
+        <p class="switch-form">¿No tienes cuenta? <span id="showRegister">Regístrate aquí</span></p>
+      </form>
+
+      <!-- Register Form -->
+      <form id="registerForm" class="auth-form hidden">
+        <h2>Crear Cuenta</h2>
+        <div class="form-group">
+          <input type="text" id="registerUsername" placeholder="Nombre de usuario" required>
+        </div>
+        <div class="form-group">
+          <input type="email" id="registerEmail" placeholder="Email" required>
+        </div>
+        <div class="form-group">
+          <input type="password" id="registerPassword" placeholder="Contraseña" required>
+        </div>
+        <button type="submit" class="btn-primary">Registrarse</button>
+        <p class="switch-form">¿Ya tienes cuenta? <span id="showLogin">Inicia sesión aquí</span></p>
+      </form>
+
+      <div id="errorMessage" class="error-message hidden"></div>
+    </div>
+  </div>
+
+  <script src="js/auth.js"></script>
+</body>
+</html>
