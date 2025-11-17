@@ -2,23 +2,10 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
+const User = require('../models/User');
 const { SECRET_KEY } = require('../middleware/auth');
 
 const router = express.Router();
-const usersFile = path.join(__dirname, '../data/users.json');
-
-// Función helper para leer usuarios
-const getUsers = () => {
-  const data = fs.readFileSync(usersFile);
-  return JSON.parse(data);
-};
-
-// Función helper para guardar usuarios
-const saveUsers = (users) => {
-  fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
-};
 
 // Registro
 router.post('/register', async (req, res) => {
@@ -29,32 +16,32 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
-    const users = getUsers();
-    
-    if (users.find(u => u.email === email)) {
+    // Verificar si el usuario ya existe
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
       return res.status(400).json({ error: 'El usuario ya existe' });
     }
 
+    // Hash de la contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = {
-      id: Date.now().toString(),
+    // Crear nuevo usuario
+    const newUser = new User({
       email,
       username,
       password: hashedPassword,
-      balance: 1000,
-      createdAt: new Date().toISOString()
-    };
+      balance: 1000
+    });
 
-    users.push(newUser);
-    saveUsers(users);
+    await newUser.save();
 
-    const token = jwt.sign({ userId: newUser.id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
+    // Generar token
+    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: newUser.id,
+        id: newUser._id,
         email: newUser.email,
         username: newUser.username,
         balance: newUser.balance,
@@ -62,6 +49,7 @@ router.post('/register', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error en registro:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -75,25 +63,25 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email y contraseña requeridos' });
     }
 
-    const users = getUsers();
-    const user = users.find(u => u.email === email);
-
+    // Buscar usuario
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
+    // Verificar contraseña
     const validPassword = await bcrypt.compare(password, user.password);
-
     if (!validPassword) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
+    // Generar token
+    const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: user.id,
+        id: user._id,
         email: user.email,
         username: user.username,
         balance: user.balance,
@@ -101,6 +89,7 @@ router.post('/login', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error en login:', error);
     res.status(500).json({ error: 'Error en el servidor' });
   }
 });
@@ -108,26 +97,23 @@ router.post('/login', async (req, res) => {
 // Crear usuario admin
 router.post('/create-admin', async (req, res) => {
   try {
-    const users = getUsers();
-    
-    if (users.find(u => u.email === 'admin@fortnite.com')) {
+    // Verificar si ya existe el admin
+    const existingAdmin = await User.findOne({ email: 'admin@fortnite.com' });
+    if (existingAdmin) {
       return res.status(400).json({ error: 'El usuario admin ya existe' });
     }
 
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
-    const adminUser = {
-      id: 'admin-' + Date.now().toString(),
+    const adminUser = new User({
       email: 'admin@fortnite.com',
       username: 'Admin Tester',
       password: hashedPassword,
       balance: 999999,
-      isAdmin: true,
-      createdAt: new Date().toISOString()
-    };
+      isAdmin: true
+    });
 
-    users.push(adminUser);
-    saveUsers(users);
+    await adminUser.save();
 
     res.json({
       success: true,
@@ -138,6 +124,7 @@ router.post('/create-admin', async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error al crear admin:', error);
     res.status(500).json({ error: 'Error al crear admin' });
   }
 });

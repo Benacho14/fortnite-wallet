@@ -1,50 +1,49 @@
 // backend/routes/admin.js
 const express = require('express');
-const fs = require('fs');
-const path = require('path');
+const User = require('../models/User');
+const Transaction = require('../models/Transaction');
 const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
-const usersFile = path.join(__dirname, '../data/users.json');
-const transactionsFile = path.join(__dirname, '../data/transactions.json');
-
-const getUsers = () => JSON.parse(fs.readFileSync(usersFile));
-const saveUsers = (users) => fs.writeFileSync(usersFile, JSON.stringify(users, null, 2));
-const getTransactions = () => JSON.parse(fs.readFileSync(transactionsFile));
-const saveTransactions = (transactions) => fs.writeFileSync(transactionsFile, JSON.stringify(transactions, null, 2));
 
 // Middleware para verificar si es admin
-const adminMiddleware = (req, res, next) => {
-  const users = getUsers();
-  const user = users.find(u => u.id === req.userId);
-  
-  if (!user || !user.isAdmin) {
-    return res.status(403).json({ error: 'Acceso denegado. Solo administradores.' });
+const adminMiddleware = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.userId);
+    
+    if (!user || !user.isAdmin) {
+      return res.status(403).json({ error: 'Acceso denegado. Solo administradores.' });
+    }
+    
+    next();
+  } catch (error) {
+    return res.status(500).json({ error: 'Error al verificar permisos' });
   }
-  
-  next();
 };
 
 // Obtener todos los usuarios
-router.get('/users', authMiddleware, adminMiddleware, (req, res) => {
+router.get('/users', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const users = getUsers();
+    const users = await User.find().select('-password');
+    
     const usersData = users.map(u => ({
-      id: u.id,
+      id: u._id,
       username: u.username,
       email: u.email,
       balance: u.balance,
       isAdmin: u.isAdmin || false,
       createdAt: u.createdAt
     }));
+    
     res.json(usersData);
   } catch (error) {
+    console.error('Error al obtener usuarios:', error);
     res.status(500).json({ error: 'Error al obtener usuarios' });
   }
 });
 
 // Modificar saldo de un usuario
-router.post('/modify-balance', authMiddleware, adminMiddleware, (req, res) => {
+router.post('/modify-balance', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { userId, newBalance } = req.body;
 
@@ -52,94 +51,94 @@ router.post('/modify-balance', authMiddleware, adminMiddleware, (req, res) => {
       return res.status(400).json({ error: 'userId y newBalance son requeridos' });
     }
 
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
+    const user = await User.findById(userId);
 
-    if (userIndex === -1) {
+    if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    const oldBalance = users[userIndex].balance;
-    users[userIndex].balance = parseInt(newBalance);
-    saveUsers(users);
+    const oldBalance = user.balance;
+    user.balance = parseInt(newBalance);
+    await user.save();
 
     // Registrar transacción
-    const transactions = getTransactions();
-    transactions.push({
-      id: Date.now().toString(),
+    const transaction = new Transaction({
       userId: userId,
       type: 'admin_modification',
       amount: parseInt(newBalance) - oldBalance,
-      description: `Modificación de admin: ${oldBalance} → ${newBalance} V-Bucks`,
-      date: new Date().toISOString()
+      description: `Modificación de admin: ${oldBalance} → ${newBalance} V-Bucks`
     });
-    saveTransactions(transactions);
+    await transaction.save();
 
     res.json({
       success: true,
       message: 'Saldo modificado exitosamente',
       user: {
-        id: users[userIndex].id,
-        username: users[userIndex].username,
+        id: user._id,
+        username: user.username,
         oldBalance,
-        newBalance: users[userIndex].balance
+        newBalance: user.balance
       }
     });
   } catch (error) {
+    console.error('Error al modificar saldo:', error);
     res.status(500).json({ error: 'Error al modificar saldo' });
   }
 });
 
 // Eliminar usuario
-router.delete('/delete-user/:userId', authMiddleware, adminMiddleware, (req, res) => {
+router.delete('/delete-user/:userId', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const { userId } = req.params;
 
-    const users = getUsers();
-    const userIndex = users.findIndex(u => u.id === userId);
+    const user = await User.findById(userId);
 
-    if (userIndex === -1) {
+    if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
 
     // No permitir eliminar admins
-    if (users[userIndex].isAdmin) {
+    if (user.isAdmin) {
       return res.status(403).json({ error: 'No se puede eliminar un administrador' });
     }
 
-    const deletedUser = users.splice(userIndex, 1)[0];
-    saveUsers(users);
+    const deletedUser = {
+      id: user._id,
+      username: user.username,
+      email: user.email
+    };
+
+    await User.findByIdAndDelete(userId);
 
     res.json({
       success: true,
       message: `Usuario ${deletedUser.username} eliminado`,
-      deletedUser: {
-        id: deletedUser.id,
-        username: deletedUser.username,
-        email: deletedUser.email
-      }
+      deletedUser: deletedUser
     });
   } catch (error) {
+    console.error('Error al eliminar usuario:', error);
     res.status(500).json({ error: 'Error al eliminar usuario' });
   }
 });
 
 // Obtener todas las transacciones (de todos los usuarios)
-router.get('/all-transactions', authMiddleware, adminMiddleware, (req, res) => {
+router.get('/all-transactions', authMiddleware, adminMiddleware, async (req, res) => {
   try {
-    const transactions = getTransactions();
-    const users = getUsers();
+    const transactions = await Transaction.find().sort({ date: -1 });
     
-    const transactionsWithUser = transactions.map(t => {
-      const user = users.find(u => u.id === t.userId);
-      return {
-        ...t,
-        username: user ? user.username : 'Usuario eliminado'
-      };
-    }).sort((a, b) => new Date(b.date) - new Date(a.date));
+    const transactionsWithUser = await Promise.all(
+      transactions.map(async (t) => {
+        const user = await User.findById(t.userId);
+        return {
+          ...t.toObject(),
+          username: user ? user.username : 'Usuario eliminado'
+        };
+      })
+    );
 
     res.json(transactionsWithUser);
   } catch (error) {
+    console.error('Error al obtener transacciones:', error);
     res.status(500).json({ error: 'Error al obtener transacciones' });
   }
 });
