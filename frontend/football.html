@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fútbol Manager - Fortnite Wallet</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-container">
+      <h1>🎮 FORTNITE WALLET</h1>
+      <div class="nav-links">
+        <a href="dashboard.html">Dashboard</a>
+        <a href="transfer.html">Transferir</a>
+        <a href="shop.html">Tienda</a>
+        <a href="football.html" class="active">⚽ Fútbol</a>
+        <a href="history.html">Historial</a>
+        <a href="admin.html">Admin Panel</a>
+        <button id="logoutBtn" class="btn-logout">Cerrar Sesión</button>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="football-header">
+      <h2>⚽ Football Manager</h2>
+      <div class="balance-mini">
+        <span class="vbucks-icon">💎</span>
+        <span id="userBalance">0</span> V-Bucks
+      </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="myteam">Mi Equipo</button>
+      <button class="tab-btn" data-tab="ligaA">Liga A</button>
+      <button class="tab-btn" data-tab="ligaB">Liga B</button>
+      <button class="tab-btn" data-tab="market">Mercado</button>
+      <button class="tab-btn" data-tab="copa">Copa</button>
+    </div>
+
+    <!-- TAB: Mi Equipo -->
+    <div id="myteamTab" class="tab-content active">
+      <!-- Sin equipo -->
+      <div id="noTeamSection" class="card">
+        <div class="card-body" style="text-align: center; padding: 3rem;">
+          <h3>⚽ Crea tu Club</h3>
+          <p style="color: var(--text-secondary); margin: 1rem 0;">
+            Crea tu propio equipo y compite en la Liga B
+          </p>
+          <p style="color: var(--legendary); font-size: 1.3rem; margin: 1rem 0;">
+            💰 Costo: 50,000 V-Bucks
+          </p>
+          
+          <form id="createTeamForm" style="max-width: 400px; margin: 2rem auto;">
+            <div class="form-group">
+              <label>Nombre del Equipo:</label>
+              <input type="text" id="teamName" placeholder="Ej: FC Barcelona" required>
+            </div>
+            
+            <div class="form-group">
+              <label>Escudo (Emoji):</label>
+              <input type="text" id="teamShield" placeholder="⚽" maxlength="2">
+            </div>
+
+            <button type="submit" class="btn-primary">Crear Equipo</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Con equipo -->
+      <div id="hasTeamSection" class="hidden">
+        <!-- Info del equipo -->
+        <div class="team-info-card">
+          <div class="team-header">
+            <div class="team-shield-large" id="myTeamShield">⚽</div>
+            <div class="team-details">
+              <h2 id="myTeamName">Mi Equipo</h2>
+              <p>Liga <span id="myTeamLeague">B</span></p>
+              <p><strong>Presupuesto:</strong> <span id="myTeamBudget">0</span> V-Bucks</p>
+              <p><strong>Valor de plantilla:</strong> <span id="myTeamValue">0</span> V-Bucks</p>
+            </div>
+            <button id="transferToClubBtn" class="btn-primary">💸 Transferir Dinero al Club</button>
+          </div>
+
+          <!-- Stats del equipo -->
+          <div class="team-stats">
+            <div class="stat-box">
+              <span class="stat-label">PJ</span>
+              <span class="stat-value" id="teamPlayed">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">G</span>
+              <span class="stat-value" id="teamWins">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">E</span>
+              <span class="stat-value" id="teamDraws">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">P</span>
+              <span class="stat-value" id="teamLosses">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">GF</span>
+              <span class="stat-value" id="teamGF">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">GC</span>
+              <span class="stat-value" id="teamGA">0</span>
+            </div>
+            <div class="stat-box">
+              <span class="stat-label">PTS</span>
+              <span class="stat-value" id="teamPoints">0</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Mejoras del club -->
+        <div class="card">
+          <div class="card-header">
+            <h3>🏗️ Mejoras del Club</h3>
+          </div>
+          <div class="card-body">
+            <div class="upgrades-grid">
+              <div class="upgrade-card">
+                <div class="upgrade-icon">👶</div>
+                <h4>Academia Juvenil</h4>
+                <p>Nivel: <span id="youthLevel">0</span>/5</p>
+                <p>Costo: <span id="youthCost">10,000</span> V-Bucks</p>
+                <button class="btn-upgrade" data-facility="youthAcademy">Mejorar</button>
+              </div>
+
+              <div class="upgrade-card">
+                <div class="upgrade-icon">🏟️</div>
+                <h4>Estadio</h4>
+                <p>Nivel: <span id="stadiumLevel">0</span>/5</p>
+                <p>Costo: <span id="stadiumCost">20,000</span> V-Bucks</p>
+                <button class="btn-upgrade" data-facility="stadium">Mejorar</button>
+              </div>
+
+              <div class="upgrade-card">
+                <div class="upgrade-icon">🏋️</div>
+                <h4>Instalaciones</h4>
+                <p>Nivel: <span id="trainingLevel">0</span>/5</p>
+                <p>Costo: <span id="trainingCost">15,000</span> V-Bucks</p>
+                <button class="btn-upgrade" data-facility="trainingFacilities">Mejorar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Plantilla -->
+        <div class="card">
+          <div class="card-header">
+            <h3>👥 Plantilla (0/25)</h3>
+          </div>
+          <div class="card-body">
+            <div id="squadList" class="squad-grid">
+              <p class="loading">Cargando plantilla...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Próximos partidos -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📅 Próximos Partidos</h3>
+          </div>
+          <div class="card-body">
+            <div id="nextMatches" class="matches-list">
+              <p class="loading">Cargando partidos...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Últimos resultados -->
+        <div class="card">
+          <div class="card-header">
+            <h3>📊 Últimos Resultados</h3>
+          </div>
+          <div class="card-body">
+            <div id="recentResults" class="matches-list">
+              <p class="loading">Cargando resultados...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Liga A -->
+    <div id="ligaATab" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3>🏆 Liga A - Clasificación</h3>
+        </div>
+        <div class="card-body">
+          <div class="league-table-container">
+            <table id="ligaATable" class="league-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th>Equipo</th>
+                  <th>PJ</th>
+                  <th>G</th>
+                  <th>E</th>
+                  <th>P</th>
+                  <th>GF</th>
+                  <th>GC</th>
+                  <th>DG</th>
+                  <th>Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="10" class="loading">Cargando tabla...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="league-info">
+            <p>🟢 Top 10: Clasifican a Copa de la Liga</p>
+            <p>🔴 Últimos 3: Descienden a Liga B</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Liga B -->
+    <div id="ligaBTab" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3>⚽ Liga B - Clasificación</h3>
+        </div>
+        <div class="card-body">
+          <div class="league-table-container">
+            <table id="ligaBTable" class="league-table">
+              <thead>
+                <tr>
+                  <th>Pos</th>
+                  <th>Equipo</th>
+                  <th>PJ</th>
+                  <th>G</th>
+                  <th>E</th>
+                  <th>P</th>
+                  <th>GF</th>
+                  <th>GC</th>
+                  <th>DG</th>
+                  <th>Pts</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td colspan="10" class="loading">Cargando tabla...</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="league-info">
+            <p>🟢 Top 3: Ascienden a Liga A</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Mercado -->
+    <div id="marketTab" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h3>🛒 Mercado de Fichajes</h3>
+        </div>
+        <div class="card-body">
+          <div class="market-filters">
+            <select id="positionFilter">
+              <option value="all">Todas las posiciones</option>
+              <option value="POR">Porteros</option>
+              <option value="DEF">Defensas</option>
+              <option value="MED">Mediocampistas</option>
+              <option value="DEL">Delanteros</option>
+            </select>
+
+            <select id="priceFilter">
+              <option value="all">Todos los precios</option>
+              <option value="0-10000">Menos de 10k</option>
+              <option value="10000-50000">10k - 50k</option>
+              <option value="50000-100000">50k - 100k</option>
+              <option value="100000-999999">Más de 100k</option>
+            </select>
+          </div>
+
+          <div id="marketList" class="players-grid">
+            <p class="loading">Cargando mercado...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB: Copa -->
+    <div id="copaTab" class="tab-content">
+      <div class="card">
+        <div class="card-body" style="text-align: center; padding: 3rem;">
+          <h3>🏆 Copa de la Liga</h3>
+          <p style="color: var(--text-secondary); margin: 2rem 0;">
+            La Copa de la Liga se jugará al finalizar la temporada regular.
+          </p>
+          <p style="color: var(--primary);">
+            Los 10 mejores equipos de Liga A clasificarán automáticamente.
+          </p>
+          <p style="margin-top: 2rem; font-size: 3rem;">🚧</p>
+          <p style="color: var(--text-secondary);">Disponible próximamente</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal transferir dinero -->
+  <div id="transferModal" class="modal hidden">
+    <div class="modal-content">
+      <h3>💸 Transferir al Club</h3>
+      <p>Tu saldo: <span id="modalUserBalance">0</span> V-Bucks</p>
+      <p>Presupuesto del club: <span id="modalClubBudget">0</span> V-Bucks</p>
+      
+      <div class="form-group">
+        <label>Cantidad a transferir:</label>
+        <input type="number" id="transferAmount" placeholder="10000" min="1">
+      </div>
+
+      <div class="modal-buttons">
+        <button id="confirmTransfer" class="btn-primary">Transferir</button>
+        <button id="cancelTransfer" class="btn-logout">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal jugador -->
+  <div id="playerModal" class="modal hidden">
+    <div class="modal-content-large">
+      <div class="modal-header">
+        <h3 id="playerModalName">Jugador</h3>
+        <button id="closePlayerModal" class="close-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="player-detail-card">
+          <div class="player-detail-header">
+            <div class="player-overall" id="playerModalOverall">75</div>
+            <div class="player-info-detail">
+              <h4 id="playerModalNameDetail">Nombre</h4>
+              <p><span id="playerModalAge">25</span> años | <span id="playerModalPos">MED</span></p>
+              <p id="playerModalNat">🇦🇷 Argentina</p>
+            </div>
+          </div>
+
+          <div class="player-stats-detail">
+            <div class="stat-bar">
+              <span>Velocidad</span>
+              <div class="stat-bar-bg"><div class="stat-bar-fill" id="statPace"></div></div>
+              <span id="statPaceValue">0</span>
+            </div>
+            <div class="stat-bar">
+              <span>Tiro</span>
+              <div class="stat-bar-bg"><div class="stat-bar-fill" id="statShoot"></div></div>
+              <span id="statShootValue">0</span>
+            </div>
+            <div class="stat-bar">
+              <span>Pase</span>
+              <div class="stat-bar-bg"><div class="stat-bar-fill" id="statPass"></div></div>
+              <span id="statPassValue">0</span>
+            </div>
+            <div class="stat-bar">
+              <span>Defensa</span>
+              <div class="stat-bar-bg"><div class="stat-bar-fill" id="statDef"></div></div>
+              <span id="statDefValue">0</span>
+            </div>
+            <div class="stat-bar">
+              <span>Físico</span>
+              <div class="stat-bar-bg"><div class="stat-bar-fill" id="statPhys"></div></div>
+              <span id="statPhysValue">0</span>
+            </div>
+          </div>
+
+          <div class="player-price">
+            <p><strong>Valor:</strong> <span id="playerModalPrice">0</span> V-Bucks</p>
+            <button id="buyPlayerBtn" class="btn-primary" data-player-id="">Fichar Jugador</button>
+            <button id="sellPlayerBtn" class="btn-primary hidden" data-player-id="">Poner en Venta</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="notification" class="notification hidden"></div>
+
+  <script src="js/football.js"></script>
+</body>
+</html>

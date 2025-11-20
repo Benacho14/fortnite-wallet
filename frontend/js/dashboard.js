@@ -159,3 +159,6 @@ function showNotification(message, type = 'success') {
 // Cargar datos iniciales
 loadBalance();
 loadRecentTransactions();
+
+console.log('🎮 Dashboard cargado por Benacho!');
+console.log('Saldo del usuario:', user.balance);
