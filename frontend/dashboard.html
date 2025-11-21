@@ -44,22 +44,26 @@
   <!-- Agregar este código en la sección de "Acciones Rápidas" de dashboard.html -->
 <!-- Reemplaza la sección de quick-actions completa con esto: -->
 
-<div class="quick-actions">
+<!-- Acciones Rápidas (como tarjeta separada igual que transacciones) -->
+<div class="card">
   <h3>⚡ Acciones Rápidas</h3>
   <div class="actions-grid">
-    <button id="rechargeBtn" class="action-btn">
+    <!-- Botón de recargar solo para admins (oculto por defecto) -->
+    <button id="rechargeBtn" class="action-btn" style="display: none;">
       <span class="action-icon">💳</span>
       <span class="action-text">Recargar +1000</span>
     </button>
+    
     <button onclick="window.location.href='shop.html'" class="action-btn">
       <span class="action-icon">🛒</span>
       <span class="action-text">Ir a Tienda</span>
     </button>
+    
     <button onclick="window.location.href='history.html'" class="action-btn">
       <span class="action-icon">📊</span>
       <span class="action-text">Ver Historial</span>
     </button>
-    <!-- NUEVO BOTÓN DE FÚTBOL -->
+    
     <button onclick="window.location.href='football.html'" class="action-btn football-btn">
       <span class="action-icon">⚽</span>
       <span class="action-text">Football Manager</span>

@@ -1,382 +1,346 @@
-// frontend/js/football.js - PARTE 1
-const API_URL = 'http://localhost:3000/api';
+// frontend/js/football.js
+const API_URL = window.location.hostname === 'localhost' 
+  ? 'http://localhost:3000/api' 
+  : 'https://fortnite-wallet.onrender.com/api';
 
+let currentTeam = null;
+let currentUser = null;
+
+// Verificar autenticación
 const token = localStorage.getItem('token');
 if (!token) {
   window.location.href = 'index.html';
 }
 
-const user = JSON.parse(localStorage.getItem('user'));
+console.log('🔧 Football Manager iniciado');
+console.log('📡 API URL:', API_URL);
+console.log('🔑 Token:', token ? 'Presente' : 'No encontrado');
 
-// Elementos del DOM
-const logoutBtn = document.getElementById('logoutBtn');
-const userBalance = document.getElementById('userBalance');
-const createTeamForm = document.getElementById('createTeamForm');
-const noTeamSection = document.getElementById('noTeamSection');
-const hasTeamSection = document.getElementById('hasTeamSection');
-const transferToClubBtn = document.getElementById('transferToClubBtn');
-const transferModal = document.getElementById('transferModal');
-const confirmTransfer = document.getElementById('confirmTransfer');
-const cancelTransfer = document.getElementById('cancelTransfer');
-const playerModal = document.getElementById('playerModal');
-const closePlayerModal = document.getElementById('closePlayerModal');
-const buyPlayerBtn = document.getElementById('buyPlayerBtn');
-const sellPlayerBtn = document.getElementById('sellPlayerBtn');
+// Cargar datos iniciales
+async function init() {
+  await loadUserData();
+  await loadTeamData();
+}
 
-let myTeam = null;
-let myPlayers = [];
-let selectedPlayer = null;
-
-// Tabs
-document.querySelectorAll('.tab-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const tabName = btn.dataset.tab;
-    
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
-    
-    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-    document.getElementById(`${tabName}Tab`).classList.add('active');
-    
-    // Cargar datos según tab
-    if (tabName === 'myteam') {
-      loadMyTeam();
-    } else if (tabName === 'ligaA') {
-      loadLeagueTable('A');
-    } else if (tabName === 'ligaB') {
-      loadLeagueTable('B');
-    } else if (tabName === 'market') {
-      loadMarket();
-    }
-  });
-});
-
-// Cargar balance del usuario
-async function loadUserBalance() {
+async function loadUserData() {
   try {
-    const response = await fetch(`${API_URL}/wallet/balance`, {
+    console.log('📥 Cargando datos de usuario...');
+    const response = await fetch(`${API_URL}/auth/me`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const data = await response.json();
-    if (response.ok) {
-      userBalance.textContent = data.balance;
+    console.log('✅ Usuario cargado:', data.user.username);
+    currentUser = data.user;
+    
+    const balanceDisplay = document.getElementById('userBalanceDisplay');
+    if (balanceDisplay) {
+      balanceDisplay.textContent = currentUser.balance;
     }
   } catch (error) {
-    console.error('Error al cargar balance:', error);
+    console.error('❌ Error al cargar usuario:', error);
+    alert('Error al cargar datos de usuario. Verifica la consola.');
   }
 }
 
-// Cargar mi equipo
-async function loadMyTeam() {
+async function loadTeamData() {
   try {
+    console.log('📥 Cargando datos de equipo...');
     const response = await fetch(`${API_URL}/football/my-team`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     
-    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     
-    if (response.ok) {
-      if (data.hasTeam) {
-        myTeam = data.team;
-        myPlayers = data.players;
-        showMyTeam();
-        loadTeamData();
-      } else {
-        showCreateTeam();
-      }
+    const data = await response.json();
+    console.log('📊 Respuesta del servidor:', data);
+    
+    const noTeamView = document.getElementById('noTeamView');
+    const hasTeamView = document.getElementById('hasTeamView');
+    
+    if (data.hasTeam) {
+      console.log('✅ Equipo encontrado:', data.team.name);
+      currentTeam = data.team;
+      if (noTeamView) noTeamView.style.display = 'none';
+      if (hasTeamView) hasTeamView.style.display = 'block';
+      displayTeamInfo(data.team, data.players);
+    } else {
+      console.log('ℹ️ Usuario sin equipo');
+      if (noTeamView) noTeamView.style.display = 'block';
+      if (hasTeamView) hasTeamView.style.display = 'none';
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error('❌ Error al cargar equipo:', error);
+    alert('Error al cargar equipo. Verifica:\n1. Que el servidor esté corriendo\n2. Que la ruta /api/football/my-team exista\n3. La consola para más detalles');
   }
 }
 
-// Mostrar formulario crear equipo
-function showCreateTeam() {
-  noTeamSection.classList.remove('hidden');
-  hasTeamSection.classList.add('hidden');
-}
-
-// Mostrar mi equipo
-function showMyTeam() {
-  noTeamSection.classList.add('hidden');
-  hasTeamSection.classList.remove('hidden');
-  
-  // Info del equipo
-  document.getElementById('myTeamShield').textContent = myTeam.shield;
-  document.getElementById('myTeamName').textContent = myTeam.name;
-  document.getElementById('myTeamLeague').textContent = myTeam.league;
-  document.getElementById('myTeamBudget').textContent = myTeam.budget.toLocaleString();
-  
-  // Calcular valor de plantilla
-  const totalValue = myPlayers.reduce((sum, p) => sum + p.marketValue, 0);
-  document.getElementById('myTeamValue').textContent = totalValue.toLocaleString();
+function displayTeamInfo(team, players) {
+  document.getElementById('teamName').textContent = team.name;
+  document.getElementById('teamLeague').textContent = team.league;
+  document.getElementById('teamAverage').textContent = team.averageOverall;
+  document.getElementById('teamShield').textContent = team.shield;
+  document.getElementById('clubBudget').textContent = `${team.budget.toLocaleString()} V-Bucks`;
   
   // Stats
-  document.getElementById('teamPlayed').textContent = myTeam.matchesPlayed;
-  document.getElementById('teamWins').textContent = myTeam.wins;
-  document.getElementById('teamDraws').textContent = myTeam.draws;
-  document.getElementById('teamLosses').textContent = myTeam.losses;
-  document.getElementById('teamGF').textContent = myTeam.goalsFor;
-  document.getElementById('teamGA').textContent = myTeam.goalsAgainst;
-  document.getElementById('teamPoints').textContent = myTeam.points;
+  document.getElementById('statsPlayed').textContent = team.stats.played;
+  document.getElementById('statsWins').textContent = team.stats.wins;
+  document.getElementById('statsDraws').textContent = team.stats.draws;
+  document.getElementById('statsLosses').textContent = team.stats.losses;
+  document.getElementById('statsGF').textContent = team.stats.goalsFor;
+  document.getElementById('statsGA').textContent = team.stats.goalsAgainst;
+  document.getElementById('statsPoints').textContent = team.stats.points;
   
-  // Mejoras
-  document.getElementById('youthLevel').textContent = myTeam.youthAcademy;
-  document.getElementById('stadiumLevel').textContent = myTeam.stadium;
-  document.getElementById('trainingLevel').textContent = myTeam.trainingFacilities;
+  // Facilities
+  document.getElementById('stadiumLevel').textContent = team.facilities.stadium;
+  document.getElementById('trainingLevel').textContent = team.facilities.trainingCenter;
+  document.getElementById('youthLevel').textContent = team.facilities.youth;
   
-  document.getElementById('youthCost').textContent = (10000 * (myTeam.youthAcademy + 1)).toLocaleString();
-  document.getElementById('stadiumCost').textContent = (20000 * (myTeam.stadium + 1)).toLocaleString();
-  document.getElementById('trainingCost').textContent = (15000 * (myTeam.trainingFacilities + 1)).toLocaleString();
-  
-  // Plantilla
-  displaySquad();
+  displaySquad(players);
 }
 
-// Mostrar plantilla
-function displaySquad() {
+function displaySquad(players) {
   const squadList = document.getElementById('squadList');
-  
-  if (myPlayers.length === 0) {
-    squadList.innerHTML = '<p class="no-data">No tienes jugadores</p>';
-    return;
-  }
-  
-  // Agrupar por posición
-  const positions = {
-    'POR': myPlayers.filter(p => p.position === 'POR'),
-    'DEF': myPlayers.filter(p => p.position === 'DEF'),
-    'MED': myPlayers.filter(p => p.position === 'MED'),
-    'DEL': myPlayers.filter(p => p.position === 'DEL')
-  };
-  
   squadList.innerHTML = '';
   
-  for (const [pos, players] of Object.entries(positions)) {
-    if (players.length > 0) {
-      const posSection = document.createElement('div');
-      posSection.className = 'position-section';
-      posSection.innerHTML = `<h4>${getPositionName(pos)} (${players.length})</h4>`;
-      
-      const playersDiv = document.createElement('div');
-      playersDiv.className = 'position-players';
-      
-      players.forEach(player => {
-        const playerCard = createPlayerCard(player, true);
-        playersDiv.appendChild(playerCard);
-      });
-      
-      posSection.appendChild(playersDiv);
-      squadList.appendChild(posSection);
-    }
-  }
-}
-
-// Crear card de jugador
-function createPlayerCard(player, isMyPlayer = false) {
-  const card = document.createElement('div');
-  card.className = 'player-card';
-  card.onclick = () => openPlayerModal(player, isMyPlayer);
-  
-  card.innerHTML = `
-    <div class="player-overall-badge">${player.overall}</div>
-    <div class="player-position-badge">${player.position}</div>
-    <div class="player-card-content">
+  players.forEach(player => {
+    const playerCard = document.createElement('div');
+    playerCard.className = 'player-card';
+    playerCard.innerHTML = `
+      <div class="player-header">
+        <span class="player-overall">${player.overall}</span>
+        <span class="player-position">${player.position}</span>
+      </div>
       <h4>${player.name}</h4>
-      <p>${player.nationality} | ${player.age} años</p>
-      <p class="player-value">${player.marketValue.toLocaleString()} V-Bucks</p>
-      ${player.onMarket ? '<span class="on-market-badge">En venta</span>' : ''}
-    </div>
-  `;
-  
-  return card;
+      <p>Edad: ${player.age} | Valor: ${player.marketValue.toLocaleString()}</p>
+      <div class="player-stats-mini">
+        <span>PAC ${player.pace}</span>
+        <span>SHO ${player.shooting}</span>
+        <span>PAS ${player.passing}</span>
+      </div>
+      <button class="btn-small" onclick="sellPlayer('${player._id}', ${player.marketValue})">Vender</button>
+    `;
+    squadList.appendChild(playerCard);
+  });
 }
 
-// Abrir modal de jugador
-function openPlayerModal(player, isMyPlayer) {
-  selectedPlayer = player;
-  
-  document.getElementById('playerModalName').textContent = player.name;
-  document.getElementById('playerModalNameDetail').textContent = player.name;
-  document.getElementById('playerModalOverall').textContent = player.overall;
-  document.getElementById('playerModalAge').textContent = player.age;
-  document.getElementById('playerModalPos').textContent = player.position;
-  document.getElementById('playerModalNat').textContent = player.nationality;
-  
-  // Stats
-  updateStatBar('statPace', player.pace);
-  updateStatBar('statShoot', player.shooting);
-  updateStatBar('statPass', player.passing);
-  updateStatBar('statDef', player.defending);
-  updateStatBar('statPhys', player.physical);
-  
-  // Precio
-  const priceToShow = player.onMarket ? player.transferPrice : player.marketValue;
-  document.getElementById('playerModalPrice').textContent = priceToShow.toLocaleString();
-  
-  // Botones
-  if (isMyPlayer) {
-    buyPlayerBtn.classList.add('hidden');
-    sellPlayerBtn.classList.remove('hidden');
-    sellPlayerBtn.dataset.playerId = player._id;
-  } else {
-    buyPlayerBtn.classList.remove('hidden');
-    sellPlayerBtn.classList.add('hidden');
-    buyPlayerBtn.dataset.playerId = player._id;
-  }
-  
-  playerModal.classList.remove('hidden');
-}
-
-// Actualizar barra de stats
-function updateStatBar(id, value) {
-  const bar = document.getElementById(id);
-  const valueSpan = document.getElementById(id + 'Value');
-  
-  bar.style.width = value + '%';
-  valueSpan.textContent = value;
-  
-  // Color según valor
-  if (value >= 80) {
-    bar.style.background = '#4ade80';
-  } else if (value >= 60) {
-    bar.style.background = '#fbbf24';
-  } else {
-    bar.style.background = '#f87171';
-  }
-}
-
-// Cerrar modal jugador
-closePlayerModal.addEventListener('click', () => {
-  playerModal.classList.add('hidden');
-});
-
-// Obtener nombre de posición
-function getPositionName(pos) {
-  const names = {
-    'POR': 'Porteros',
-    'DEF': 'Defensas',
-    'MED': 'Mediocampistas',
-    'DEL': 'Delanteros'
-  };
-  return names[pos] || pos;
-}
-
-// Cargar datos adicionales del equipo
-async function loadTeamData() {
-  if (!myTeam) return;
-  
-  // Próximos partidos
+async function loadLeague(league) {
   try {
-    const response = await fetch(`${API_URL}/football/next-matches/${myTeam._id}`, {
+    const response = await fetch(`${API_URL}/football/league/${league}`, {
       headers: { 'Authorization': `Bearer ${token}` }
     });
-    
-    const matches = await response.json();
-    displayMatches(matches, 'nextMatches', false);
+    const data = await response.json();
+    displayLeagueTable(data.teams);
   } catch (error) {
-    console.error('Error:', error);
-  }
-  
-  // Últimos resultados
-  try {
-    const response = await fetch(`${API_URL}/football/recent-results/${myTeam._id}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    const results = await response.json();
-    displayMatches(results, 'recentResults', true);
-  } catch (error) {
-    console.error('Error:', error);
+    console.error('Error al cargar liga:', error);
   }
 }
 
-// Mostrar partidos
-function displayMatches(matches, containerId, showScore) {
-  const container = document.getElementById(containerId);
+function displayLeagueTable(teams) {
+  const tbody = document.getElementById('leagueTableBody');
+  tbody.innerHTML = '';
   
-  if (matches.length === 0) {
-    container.innerHTML = '<p class="no-data">No hay partidos</p>';
+  teams.forEach((team, index) => {
+    const row = document.createElement('tr');
+    const isMyTeam = currentTeam && team._id === currentTeam._id;
+    if (isMyTeam) row.classList.add('my-team');
+    
+    const gd = team.stats.goalsFor - team.stats.goalsAgainst;
+    
+    row.innerHTML = `
+      <td>${index + 1}</td>
+      <td>${team.name} ${isMyTeam ? '⭐' : ''}</td>
+      <td>${team.stats.played}</td>
+      <td>${team.stats.wins}</td>
+      <td>${team.stats.draws}</td>
+      <td>${team.stats.losses}</td>
+      <td>${team.stats.goalsFor}</td>
+      <td>${team.stats.goalsAgainst}</td>
+      <td>${gd >= 0 ? '+' : ''}${gd}</td>
+      <td><strong>${team.stats.points}</strong></td>
+    `;
+    tbody.appendChild(row);
+  });
+}
+
+async function loadMarket() {
+  try {
+    const response = await fetch(`${API_URL}/football/market`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    displayMarket(data.players);
+  } catch (error) {
+    console.error('Error al cargar mercado:', error);
+  }
+}
+
+function displayMarket(players) {
+  const marketList = document.getElementById('marketList');
+  marketList.innerHTML = '';
+  
+  if (players.length === 0) {
+    marketList.innerHTML = '<p>No hay jugadores en venta actualmente.</p>';
     return;
   }
   
-  container.innerHTML = matches.map(m => {
-    const isHome = m.homeTeam._id === myTeam._id;
-    
-    return `
-      <div class="match-card">
-        <div class="match-teams">
-          <div class="match-team ${isHome ? 'my-team' : ''}">
-            <span class="team-shield">${m.homeTeam.shield}</span>
-            <span class="team-name">${m.homeTeam.name}</span>
-          </div>
-          <div class="match-score">
-            ${showScore ? `${m.homeGoals} - ${m.awayGoals}` : 'vs'}
-          </div>
-          <div class="match-team ${!isHome ? 'my-team' : ''}">
-            <span class="team-name">${m.awayTeam.name}</span>
-            <span class="team-shield">${m.awayTeam.shield}</span>
-          </div>
-        </div>
-        <div class="match-info">
-          ${showScore ? `Jornada ${m.matchday}` : `Próxima jornada: ${m.matchday}`}
-        </div>
+  players.forEach(player => {
+    const playerCard = document.createElement('div');
+    playerCard.className = 'player-card';
+    playerCard.innerHTML = `
+      <div class="player-header">
+        <span class="player-overall">${player.overall}</span>
+        <span class="player-position">${player.position}</span>
       </div>
+      <h4>${player.name}</h4>
+      <p>Equipo: ${player.teamId.name}</p>
+      <p>Edad: ${player.age} años</p>
+      <p class="price">💰 ${player.askingPrice.toLocaleString()} V-Bucks</p>
+      <button class="btn-primary" onclick="openOfferModal('${player._id}', '${player.name}', ${player.askingPrice})">Hacer Oferta</button>
     `;
-  }).join('');
+    marketList.appendChild(playerCard);
+  });
 }
 
-// Crear equipo
-createTeamForm.addEventListener('submit', async (e) => {
+async function loadOffers() {
+  try {
+    const response = await fetch(`${API_URL}/football/my-offers`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await response.json();
+    
+    displayReceivedOffers(data.received);
+    displaySentOffers(data.sent);
+  } catch (error) {
+    console.error('Error al cargar ofertas:', error);
+  }
+}
+
+function displayReceivedOffers(offers) {
+  const container = document.getElementById('receivedOffers');
+  container.innerHTML = '';
+  
+  if (offers.length === 0) {
+    container.innerHTML = '<p>No tienes ofertas recibidas.</p>';
+    return;
+  }
+  
+  offers.forEach(offer => {
+    const offerCard = document.createElement('div');
+    offerCard.className = 'offer-card';
+    offerCard.innerHTML = `
+      <h4>${offer.playerId.name} (${offer.playerId.overall})</h4>
+      <p>De: ${offer.toTeam.name}</p>
+      <p>Oferta: ${offer.offerAmount.toLocaleString()} V-Bucks</p>
+      <div class="offer-actions">
+        <button class="btn-success" onclick="respondOffer('${offer._id}', true)">Aceptar</button>
+        <button class="btn-danger" onclick="respondOffer('${offer._id}', false)">Rechazar</button>
+      </div>
+    `;
+    container.appendChild(offerCard);
+  });
+}
+
+function displaySentOffers(offers) {
+  const container = document.getElementById('sentOffers');
+  container.innerHTML = '';
+  
+  if (offers.length === 0) {
+    container.innerHTML = '<p>No has enviado ofertas.</p>';
+    return;
+  }
+  
+  offers.forEach(offer => {
+    const offerCard = document.createElement('div');
+    offerCard.className = 'offer-card';
+    offerCard.innerHTML = `
+      <h4>${offer.playerId.name} (${offer.playerId.overall})</h4>
+      <p>A: ${offer.fromTeam.name}</p>
+      <p>Oferta: ${offer.offerAmount.toLocaleString()} V-Bucks</p>
+      <p>Estado: <span class="status-${offer.status}">${offer.status}</span></p>
+    `;
+    container.appendChild(offerCard);
+  });
+}
+
+// Event Listeners
+document.getElementById('createTeamBtn').addEventListener('click', () => {
+  document.getElementById('createTeamModal').style.display = 'block';
+});
+
+document.getElementById('createTeamForm').addEventListener('submit', async (e) => {
   e.preventDefault();
   
-  const name = document.getElementById('teamName').value;
-  const shield = document.getElementById('teamShield').value || '⚽';
+  const name = document.getElementById('teamNameInput').value;
+  const primaryColor = document.getElementById('primaryColor').value;
+  const secondaryColor = document.getElementById('secondaryColor').value;
+  const shield = document.getElementById('shieldInput').value;
   
   try {
     const response = await fetch(`${API_URL}/football/create-team`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ name, shield })
+      body: JSON.stringify({ name, primaryColor, secondaryColor, shield })
     });
     
     const data = await response.json();
     
-    if (response.ok && data.success) {
-      showNotification(data.message, 'success');
-      createTeamForm.reset();
-      loadUserBalance();
-      loadMyTeam();
+    if (response.ok) {
+      alert(data.message);
+      document.getElementById('createTeamModal').style.display = 'none';
+      location.reload();
     } else {
-      showNotification(data.error, 'error');
+      alert(data.error);
     }
   } catch (error) {
-    showNotification('Error al crear equipo', 'error');
+    console.error('Error al crear equipo:', error);
   }
 });
 
-// Abrir modal transferir
-transferToClubBtn.addEventListener('click', () => {
-  document.getElementById('modalUserBalance').textContent = userBalance.textContent;
-  document.getElementById('modalClubBudget').textContent = myTeam.budget.toLocaleString();
-  transferModal.classList.remove('hidden');
+document.getElementById('simulateBtn').addEventListener('click', async () => {
+  if (!confirm('¿Simular la siguiente jornada?')) return;
+  
+  try {
+    const response = await fetch(`${API_URL}/football/simulate-matchday`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ league: currentTeam.league })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert(data.message);
+      location.reload();
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error('Error al simular jornada:', error);
+  }
 });
 
-// Cerrar modal transferir
-cancelTransfer.addEventListener('click', () => {
-  transferModal.classList.add('hidden');
+document.getElementById('transferVBucksBtn').addEventListener('click', () => {
+  document.getElementById('transferModal').style.display = 'block';
 });
 
-// Confirmar transferencia
-confirmTransfer.addEventListener('click', async () => {
+document.getElementById('submitTransferBtn').addEventListener('click', async () => {
   const amount = parseInt(document.getElementById('transferAmount').value);
   
   if (!amount || amount <= 0) {
-    showNotification('Monto inválido', 'error');
+    alert('Ingresa una cantidad válida');
     return;
   }
   
@@ -384,261 +348,196 @@ confirmTransfer.addEventListener('click', async () => {
     const response = await fetch(`${API_URL}/football/transfer-to-club`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
       body: JSON.stringify({ amount })
     });
     
     const data = await response.json();
     
-    if (response.ok && data.success) {
-      showNotification(data.message, 'success');
-      transferModal.classList.add('hidden');
-      document.getElementById('transferAmount').value = '';
-      
-      // Actualizar balances
-      userBalance.textContent = data.newUserBalance;
-      document.getElementById('myTeamBudget').textContent = data.newClubBudget.toLocaleString();
-      myTeam.budget = data.newClubBudget;
+    if (response.ok) {
+      alert(data.message);
+      document.getElementById('transferModal').style.display = 'none';
+      location.reload();
     } else {
-      showNotification(data.error, 'error');
+      alert(data.error);
     }
   } catch (error) {
-    showNotification('Error en la transferencia', 'error');
+    console.error('Error al transferir:', error);
   }
 });
 
-// Continúa en la siguiente parte...
-// frontend/js/football.js - PARTE 2
+// Tabs
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tab = btn.dataset.tab;
+    
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    btn.classList.add('active');
+    document.getElementById(`tab-${tab}`).classList.add('active');
+    
+    if (tab === 'league') loadLeague(currentTeam.league);
+    if (tab === 'market') loadMarket();
+    if (tab === 'transfers') loadOffers();
+  });
+});
 
-// Mejorar instalaciones
+// League selector
+document.querySelectorAll('.league-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const league = btn.dataset.league;
+    document.querySelectorAll('.league-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    loadLeague(league);
+  });
+});
+
+// Upgrade facilities
 document.querySelectorAll('.btn-upgrade').forEach(btn => {
   btn.addEventListener('click', async () => {
     const facility = btn.dataset.facility;
     
-    if (!confirm('¿Mejorar esta instalación?')) return;
+    if (!confirm(`¿Mejorar ${facility}?`)) return;
     
     try {
       const response = await fetch(`${API_URL}/football/upgrade-facility`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify({ facility })
+        body: JSON.stringify({ facilityType: facility })
       });
       
       const data = await response.json();
       
-      if (response.ok && data.success) {
-        showNotification(data.message, 'success');
-        loadMyTeam();
+      if (response.ok) {
+        alert(data.message);
+        location.reload();
       } else {
-        showNotification(data.error, 'error');
+        alert(data.error);
       }
     } catch (error) {
-      showNotification('Error al mejorar', 'error');
+      console.error('Error al mejorar instalación:', error);
     }
   });
 });
 
-// Cargar tabla de liga
-async function loadLeagueTable(league) {
-  try {
-    const response = await fetch(`${API_URL}/football/league-table/${league}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    const teams = await response.json();
-    
-    if (response.ok) {
-      displayLeagueTable(teams, league);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-// Mostrar tabla
-function displayLeagueTable(teams, league) {
-  const tableId = league === 'A' ? 'ligaATable' : 'ligaBTable';
-  const tbody = document.querySelector(`#${tableId} tbody`);
+async function sellPlayer(playerId, marketValue) {
+  const askingPrice = prompt(`Precio de venta (valor de mercado: ${marketValue}):`, marketValue);
   
-  if (teams.length === 0) {
-    tbody.innerHTML = '<tr><td colspan="10" class="no-data">No hay equipos</td></tr>';
-    return;
-  }
-  
-  tbody.innerHTML = teams.map(t => {
-    let rowClass = '';
-    
-    if (league === 'A') {
-      if (t.position <= 10) rowClass = 'copa-zone';
-      if (t.position >= 18) rowClass = 'relegation-zone';
-    } else {
-      if (t.position <= 3) rowClass = 'promotion-zone';
-    }
-    
-    const isMyTeam = myTeam && t.id === myTeam._id;
-    
-    return `
-      <tr class="${rowClass} ${isMyTeam ? 'my-team-row' : ''}">
-        <td>${t.position}</td>
-        <td>
-          <div class="team-cell">
-            <span>${t.shield}</span>
-            <span>${t.name}</span>
-            ${isMyTeam ? '<span class="my-team-badge">TÚ</span>' : ''}
-            ${t.isNPC ? '' : `<span class="user-badge">${t.owner}</span>`}
-          </div>
-        </td>
-        <td>${t.played}</td>
-        <td>${t.wins}</td>
-        <td>${t.draws}</td>
-        <td>${t.losses}</td>
-        <td>${t.goalsFor}</td>
-        <td>${t.goalsAgainst}</td>
-        <td>${t.goalDifference}</td>
-        <td><strong>${t.points}</strong></td>
-      </tr>
-    `;
-  }).join('');
-}
-
-// Cargar mercado
-async function loadMarket() {
-  try {
-    const response = await fetch(`${API_URL}/football/transfer-market`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    
-    const players = await response.json();
-    
-    if (response.ok) {
-      displayMarket(players);
-    }
-  } catch (error) {
-    console.error('Error:', error);
-  }
-}
-
-// Mostrar mercado
-function displayMarket(players) {
-  const container = document.getElementById('marketList');
-  
-  if (players.length === 0) {
-    container.innerHTML = '<p class="no-data">No hay jugadores en el mercado</p>';
-    return;
-  }
-  
-  container.innerHTML = '';
-  
-  players.forEach(player => {
-    const card = createPlayerCard(player, false);
-    container.appendChild(card);
-  });
-}
-
-// Filtros del mercado
-document.getElementById('positionFilter').addEventListener('change', filterMarket);
-document.getElementById('priceFilter').addEventListener('change', filterMarket);
-
-function filterMarket() {
-  // Recargar mercado con filtros (implementación básica)
-  loadMarket();
-}
-
-// Comprar jugador
-buyPlayerBtn.addEventListener('click', async () => {
-  if (!selectedPlayer) return;
-  
-  if (!confirm(`¿Fichar a ${selectedPlayer.name} por ${selectedPlayer.transferPrice} V-Bucks?`)) {
-    return;
-  }
-  
-  try {
-    const response = await fetch(`${API_URL}/football/buy-player`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ playerId: selectedPlayer._id })
-    });
-    
-    const data = await response.json();
-    
-    if (response.ok && data.success) {
-      showNotification(data.message, 'success');
-      playerModal.classList.add('hidden');
-      loadMyTeam();
-      loadMarket();
-    } else {
-      showNotification(data.error, 'error');
-    }
-  } catch (error) {
-    showNotification('Error al fichar jugador', 'error');
-  }
-});
-
-// Vender jugador
-sellPlayerBtn.addEventListener('click', async () => {
-  if (!selectedPlayer) return;
-  
-  const price = prompt(`¿Por cuánto quieres vender a ${selectedPlayer.name}?\n(Valor de mercado: ${selectedPlayer.marketValue})`);
-  
-  if (!price || parseInt(price) <= 0) {
-    showNotification('Precio inválido', 'error');
-    return;
-  }
+  if (!askingPrice) return;
   
   try {
     const response = await fetch(`${API_URL}/football/sell-player`, {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ 
-        playerId: selectedPlayer._id,
-        price: parseInt(price)
-      })
+      body: JSON.stringify({ playerId, askingPrice: parseInt(askingPrice) })
     });
     
     const data = await response.json();
     
-    if (response.ok && data.success) {
-      showNotification(data.message, 'success');
-      playerModal.classList.add('hidden');
-      loadMyTeam();
+    if (response.ok) {
+      alert(data.message);
+      location.reload();
     } else {
-      showNotification(data.error, 'error');
+      alert(data.error);
     }
   } catch (error) {
-    showNotification('Error al poner en venta', 'error');
+    console.error('Error:', error);
+  }
+}
+
+let currentOfferId = null;
+
+function openOfferModal(playerId, playerName, askingPrice) {
+  currentOfferId = playerId;
+  document.getElementById('offerPlayerName').textContent = `Jugador: ${playerName}`;
+  document.getElementById('offerAskingPrice').textContent = `Precio pedido: ${askingPrice.toLocaleString()} V-Bucks`;
+  document.getElementById('offerAmount').value = askingPrice;
+  document.getElementById('offerModal').style.display = 'block';
+}
+
+document.getElementById('submitOfferBtn').addEventListener('click', async () => {
+  const offerAmount = parseInt(document.getElementById('offerAmount').value);
+  
+  if (!offerAmount || offerAmount <= 0) {
+    alert('Ingresa una cantidad válida');
+    return;
+  }
+  
+  try {
+    const response = await fetch(`${API_URL}/football/make-offer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ playerId: currentOfferId, offerAmount })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert(data.message);
+      document.getElementById('offerModal').style.display = 'none';
+      loadMarket();
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error('Error al hacer oferta:', error);
+  }
+});
+
+async function respondOffer(transferId, accept) {
+  try {
+    const response = await fetch(`${API_URL}/football/respond-offer`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ transferId, accept })
+    });
+    
+    const data = await response.json();
+    
+    if (response.ok) {
+      alert(data.message);
+      loadOffers();
+    } else {
+      alert(data.error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+// Cerrar modales
+document.querySelectorAll('.close').forEach(closeBtn => {
+  closeBtn.addEventListener('click', () => {
+    closeBtn.closest('.modal').style.display = 'none';
+  });
+});
+
+window.addEventListener('click', (e) => {
+  if (e.target.classList.contains('modal')) {
+    e.target.style.display = 'none';
   }
 });
 
 // Logout
-logoutBtn.addEventListener('click', () => {
+document.getElementById('logoutBtn').addEventListener('click', () => {
   localStorage.removeItem('token');
-  localStorage.removeItem('user');
   window.location.href = 'index.html';
 });
 
-// Notificaciones
-function showNotification(message, type = 'success') {
-  const notification = document.getElementById('notification');
-  notification.textContent = message;
-  notification.className = `notification ${type}`;
-  notification.classList.remove('hidden');
-  
-  setTimeout(() => {
-    notification.classList.add('hidden');
-  }, 3000);
-}
-
-// Cargar datos iniciales
-loadUserBalance();
-loadMyTeam();
+// Inicializar
+init();
