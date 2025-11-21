@@ -3,9 +3,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
-const { SECRET_KEY } = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 
 const router = express.Router();
+const SECRET_KEY = process.env.SECRET_KEY || 'fortnite_wallet_secret_2024';
 
 // Registro
 router.post('/register', async (req, res) => {
@@ -16,8 +17,10 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
+    const users = readUsers();
+
     // Verificar si el usuario ya existe
-    const existingUser = await User.findOne({ email });
+    const existingUser = users.find(u => u.email === email);
     if (existingUser) {
       return res.status(400).json({ error: 'El usuario ya existe' });
     }
@@ -26,26 +29,29 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear nuevo usuario
-    const newUser = new User({
+    const newUser = {
+      id: Date.now().toString(),
       email,
       username,
       password: hashedPassword,
-      balance: 1000
-    });
+      balance: 1000,
+      isAdmin: false
+    };
 
-    await newUser.save();
+    users.push(newUser);
+    writeUsers(users);
 
     // Generar token
-    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: newUser.id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: newUser._id,
+        id: newUser.id,
         email: newUser.email,
         username: newUser.username,
         balance: newUser.balance,
-        isAdmin: newUser.isAdmin || false
+        isAdmin: newUser.isAdmin
       }
     });
   } catch (error) {
@@ -63,8 +69,10 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email y contraseña requeridos' });
     }
 
+    const users = readUsers();
+
     // Buscar usuario
-    const user = await User.findOne({ email });
+    const user = users.find(u => u.email === email);
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
@@ -76,12 +84,12 @@ router.post('/login', async (req, res) => {
     }
 
     // Generar token
-    const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: user._id,
+        id: user.id,
         email: user.email,
         username: user.username,
         balance: user.balance,
@@ -94,47 +102,10 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// Crear usuario admin
-router.post('/create-admin', async (req, res) => {
-  try {
-    // Verificar si ya existe el admin
-    const existingAdmin = await User.findOne({ email: 'admin@fortnite.com' });
-    if (existingAdmin) {
-      return res.status(400).json({ error: 'El usuario admin ya existe' });
-    }
-
-    const hashedPassword = await bcrypt.hash('admin123', 10);
-
-    const adminUser = new User({
-      email: 'admin@fortnite.com',
-      username: 'Admin Tester',
-      password: hashedPassword,
-      balance: 999999,
-      isAdmin: true
-    });
-
-    await adminUser.save();
-
-    res.json({
-      success: true,
-      message: 'Usuario admin creado exitosamente',
-      credentials: {
-        email: 'admin@fortnite.com',
-        password: 'admin123'
-      }
-    });
-  } catch (error) {
-    console.error('Error al crear admin:', error);
-    res.status(500).json({ error: 'Error al crear admin' });
-  }
-});
-
 // Ruta para obtener datos del usuario autenticado
-router.get('/me', authMiddleware, (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
   try {
-    // Leer usuarios desde el archivo JSON
-    const usersData = fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8');
-    const users = JSON.parse(usersData);
+    const users = readUsers();
     
     // Buscar el usuario por ID (viene del token decodificado)
     const user = users.find(u => u.id === req.userId);
@@ -157,6 +128,45 @@ router.get('/me', authMiddleware, (req, res) => {
   } catch (error) {
     console.error('Error al obtener usuario:', error);
     res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
+// Crear usuario admin (opcional - para testing)
+router.post('/create-admin', async (req, res) => {
+  try {
+    const users = readUsers();
+    
+    // Verificar si ya existe el admin
+    const existingAdmin = users.find(u => u.email === 'admin@fortnite.com');
+    if (existingAdmin) {
+      return res.status(400).json({ error: 'El usuario admin ya existe' });
+    }
+
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+
+    const adminUser = {
+      id: Date.now().toString(),
+      email: 'admin@fortnite.com',
+      username: 'Admin Tester',
+      password: hashedPassword,
+      balance: 999999,
+      isAdmin: true
+    };
+
+    users.push(adminUser);
+    writeUsers(users);
+
+    res.json({
+      success: true,
+      message: 'Usuario admin creado exitosamente',
+      credentials: {
+        email: 'admin@fortnite.com',
+        password: 'admin123'
+      }
+    });
+  } catch (error) {
+    console.error('Error al crear admin:', error);
+    res.status(500).json({ error: 'Error al crear admin' });
   }
 });
 
