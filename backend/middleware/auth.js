@@ -1,7 +1,7 @@
 // backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = 'fortnite_secret_key_2024';
+const SECRET_KEY = process.env.SECRET_KEY || 'fortnite_secret_key_2024';
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
@@ -20,4 +20,7 @@ const authMiddleware = (req, res, next) => {
   }
 };
 
-module.exports = { authMiddleware, SECRET_KEY };
+// Exportar la función como default
+module.exports = authMiddleware;
+// Exportar SECRET_KEY aparte
+module.exports.SECRET_KEY = SECRET_KEY;
