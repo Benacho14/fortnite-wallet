@@ -129,4 +129,35 @@ router.post('/create-admin', async (req, res) => {
   }
 });
 
+// Ruta para obtener datos del usuario autenticado
+router.get('/me', authMiddleware, (req, res) => {
+  try {
+    // Leer usuarios desde el archivo JSON
+    const usersData = fs.readFileSync(path.join(__dirname, '../data/users.json'), 'utf8');
+    const users = JSON.parse(usersData);
+    
+    // Buscar el usuario por ID (viene del token decodificado)
+    const user = users.find(u => u.id === req.userId);
+    
+    if (!user) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+    
+    // Devolver datos del usuario (sin la contraseña)
+    res.json({ 
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+        balance: user.balance,
+        isAdmin: user.isAdmin || false
+      }
+    });
+    
+  } catch (error) {
+    console.error('Error al obtener usuario:', error);
+    res.status(500).json({ error: 'Error del servidor' });
+  }
+});
+
 module.exports = router;
