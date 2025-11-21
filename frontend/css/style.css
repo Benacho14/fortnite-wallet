@@ -1398,3 +1398,48 @@
 }
 
   }
+
+  /* Acciones Rápidas - Dashboard */
+.quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  background: rgba(15, 20, 25, 0.5);
+  border: 2px solid rgba(0, 180, 216, 0.3);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--text);
+  transition: all 0.3s;
+  text-align: center;
+}
+
+.action-btn:hover {
+  background: rgba(0, 180, 216, 0.2);
+  border-color: var(--primary);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 30px rgba(0, 180, 216, 0.3);
+}
+
+.action-btn .action-icon {
+  font-size: 2.5rem;
+}
+
+.action-btn h4 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.action-btn p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

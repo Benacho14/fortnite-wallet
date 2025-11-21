@@ -2,61 +2,30 @@
 const mongoose = require('mongoose');
 
 const teamSchema = new mongoose.Schema({
-  name: {
-    type: String,
+  ownerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
     required: true,
     unique: true
   },
-  shield: {
+  teamName: {
     type: String,
-    default: '⚽'
+    required: true
   },
-  ownerId: {
+  stadium: {
     type: String,
-    default: null // null = equipo NPC
-  },
-  isNPC: {
-    type: Boolean,
-    default: true
-  },
-  league: {
-    type: String,
-    enum: ['A', 'B'],
-    default: 'B'
+    default: '🏟️ Estadio Básico'
   },
   budget: {
     type: Number,
-    default: 50000
-  },
-  teamValue: {
-    type: Number,
     default: 0
   },
-  // Mejoras del club
-  youthAcademy: {
-    type: Number,
-    default: 0, // Nivel 0-5
-    cost: 10000
-  },
-  stadium: {
-    type: Number,
-    default: 0, // Nivel 0-5
-    cost: 20000
-  },
-  trainingFacilities: {
-    type: Number,
-    default: 0, // Nivel 0-5
-    cost: 15000
-  },
-  // Estadísticas
-  points: {
-    type: Number,
-    default: 0
-  },
-  matchesPlayed: {
-    type: Number,
-    default: 0
-  },
+  players: [{
+    name: String,
+    position: String,
+    rating: Number,
+    price: Number
+  }],
   wins: {
     type: Number,
     default: 0
@@ -69,18 +38,10 @@ const teamSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
-  goalsFor: {
+  points: {
     type: Number,
     default: 0
-  },
-  goalsAgainst: {
-    type: Number,
-    default: 0
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now
   }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('Team', teamSchema);

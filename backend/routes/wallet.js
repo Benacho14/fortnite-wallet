@@ -22,17 +22,22 @@ router.get('/balance', authMiddleware, async (req, res) => {
   }
 });
 
-// Recargar saldo
+// Recargar saldo (SOLO ADMINS)
 router.post('/recharge', authMiddleware, async (req, res) => {
   try {
-    const { amount } = req.body;
-    const rechargeAmount = amount || 1000;
-
     const user = await User.findById(req.userId);
 
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
     }
+
+    // Verificar si es admin
+    if (!user.isAdmin) {
+      return res.status(403).json({ error: 'Solo los administradores pueden recargar saldo' });
+    }
+
+    const { amount } = req.body;
+    const rechargeAmount = amount || 1000;
 
     // Actualizar balance
     user.balance += rechargeAmount;

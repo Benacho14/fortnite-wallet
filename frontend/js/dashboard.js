@@ -51,7 +51,50 @@ async function loadRecentTransactions() {
     });
 
     const data = await response.json();
-    const transactions = data.transactions.slice(0, 5); // Solo las últimas 5
+    // Cargar transacciones recientes
+async function loadRecentTransactions() {
+  try {
+    const response = await fetch(`${API_URL}/wallet/transactions`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    const data = await response.json();
+    
+    // Verificar si hay transacciones
+    if (!data || !Array.isArray(data)) {
+      container.innerHTML = '<p>No tienes transacciones aún.</p>';
+      return;
+    }
+    
+    const transactions = data.slice(0, 5); // Solo las últimas 5
+
+    const container = document.getElementById('recentTransactions');
+    
+    if (transactions.length === 0) {
+      container.innerHTML = '<p>No tienes transacciones aún.</p>';
+      return;
+    }
+
+    container.innerHTML = transactions.map(t => `
+      <div class="transaction-item ${t.type === 'recharge' || t.type === 'admin_modification' ? 'positive' : 'negative'}">
+        <div class="transaction-info">
+          <span class="transaction-type">${getTransactionIcon(t.type)} ${t.description}</span>
+          <span class="transaction-date">${new Date(t.date).toLocaleDateString()}</span>
+        </div>
+        <span class="transaction-amount ${t.type === 'recharge' || t.type === 'admin_modification' ? 'positive' : 'negative'}">
+          ${t.amount > 0 ? '+' : ''}${t.amount.toLocaleString()} V-Bucks
+        </span>
+      </div>
+    `).join('');
+
+  } catch (error) {
+    console.error('Error al cargar transacciones:', error);
+    const container = document.getElementById('recentTransactions');
+    container.innerHTML = '<p>No se pudieron cargar las transacciones.</p>';
+  }
+}
 
     const container = document.getElementById('recentTransactions');
     

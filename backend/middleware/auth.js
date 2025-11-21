@@ -1,7 +1,7 @@
 // backend/middleware/auth.js
 const jwt = require('jsonwebtoken');
 
-const SECRET_KEY = process.env.SECRET_KEY || 'fortnite_secret_key_2024';
+const SECRET_KEY = process.env.SECRET_KEY || 'fortnite_wallet_secret_2024';
 
 const authMiddleware = (req, res, next) => {
   const token = req.headers['authorization']?.split(' ')[1];
