@@ -41,30 +41,67 @@
       <button id="rechargeBtn" class="btn-primary">Recargar +1000 V-Bucks</button>
       <a href="transfer.html" class="btn-primary" style="margin-top: 0.5rem; background: linear-gradient(90deg, #f72585, #7209b7); text-decoration: none; display: block; text-align: center;">💸 Transferir V-Bucks</a>
     </div>
+  <!-- Agregar este código en la sección de "Acciones Rápidas" de dashboard.html -->
+<!-- Reemplaza la sección de quick-actions completa con esto: -->
+
+<div class="quick-actions">
+  <h3>⚡ Acciones Rápidas</h3>
+  <div class="actions-grid">
+    <button id="rechargeBtn" class="action-btn">
+      <span class="action-icon">💳</span>
+      <span class="action-text">Recargar +1000</span>
+    </button>
+    <button onclick="window.location.href='shop.html'" class="action-btn">
+      <span class="action-icon">🛒</span>
+      <span class="action-text">Ir a Tienda</span>
+    </button>
+    <button onclick="window.location.href='history.html'" class="action-btn">
+      <span class="action-icon">📊</span>
+      <span class="action-text">Ver Historial</span>
+    </button>
+    <!-- NUEVO BOTÓN DE FÚTBOL -->
+    <button onclick="window.location.href='football.html'" class="action-btn football-btn">
+      <span class="action-icon">⚽</span>
+      <span class="action-text">Football Manager</span>
+    </button>
   </div>
-      <!-- Quick Actions -->
-      <div class="card">
-        <div class="card-header">
-          <h3>⚡ Acciones Rápidas</h3>
-        </div>
-        <div class="card-body">
-          <a href="shop.html" class="action-btn">
-            <span class="action-icon">🛒</span>
-            <div class="action-info">
-              <h4>Ir a la Tienda</h4>
-              <p>Compra skins y accesorios</p>
-            </div>
-          </a>
-          <a href="history.html" class="action-btn">
-            <span class="action-icon">📜</span>
-            <div class="action-info">
-              <h4>Ver Historial</h4>
-              <p>Revisa tus transacciones</p>
-            </div>
-          </a>
-        </div>
-      </div>
-    </div>
+</div>
+
+<!-- También agregar este CSS en tu archivo css/style.css -->
+<style>
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+  margin-top: 20px;
+}
+
+.football-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.football-btn::before {
+  content: '⚽';
+  position: absolute;
+  font-size: 5em;
+  opacity: 0.1;
+  right: -20px;
+  bottom: -20px;
+  animation: rotate 10s linear infinite;
+}
+
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.football-btn:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+}
+</style>
 
     <!-- Recent Transactions -->
     <div class="card">

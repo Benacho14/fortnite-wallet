@@ -1,189 +1,147 @@
-// backend/scripts/initializeFootball.js
+// backend/scripts/initFootball.js
+// Ejecutar este script UNA VEZ para crear los equipos NPC de ambas ligas
+
 const mongoose = require('mongoose');
 const Team = require('../models/Team');
 const Player = require('../models/Player');
-const Match = require('../models/Match');
 
-const MONGODB_URI = 'mongodb+srv://admin:4S83KNO1niY8iMqF@fortnite-wallet.kno3iq7.mongodb.net/fortnite-wallet?retryWrites=true&w=majority';
+const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fortnite-wallet';
 
-async function initializeFootball() {
+const teamNamesLeagueA = [
+  'Real Madrid', 'Barcelona', 'Atlético', 'Valencia', 'Sevilla',
+  'Villarreal', 'Real Betis', 'Athletic Club', 'Real Sociedad', 'Celta',
+  'Espanyol', 'Getafe', 'Osasuna', 'Granada', 'Levante',
+  'Alavés', 'Valladolid', 'Eibar', 'Mallorca', 'Cádiz'
+];
+
+const teamNamesLeagueB = [
+  'Sporting', 'Zaragoza', 'Málaga', 'Oviedo', 'Tenerife',
+  'Las Palmas', 'Almería', 'Mirandés', 'Cartagena', 'Burgos',
+  'Ponferradina', 'Lugo', 'Fuenlabrada', 'Sabadell', 'Alcorcón',
+  'Leganés', 'Castellón', 'Girona', 'Huesca', 'Elche'
+];
+
+async function initFootball() {
   try {
     await mongoose.connect(MONGODB_URI);
-    console.log('✅ Conectado a MongoDB');
+    console.log('🔌 Conectado a MongoDB');
 
-    // Equipos de Liga A
-    const teamsLigaA = [
-      { name: 'Real Madrid CF', shield: '⚪', league: 'A' },
-      { name: 'FC Barcelona', shield: '🔵', league: 'A' },
-      { name: 'Atlético Madrid', shield: '🔴', league: 'A' },
-      { name: 'Sevilla FC', shield: '🔴', league: 'A' },
-      { name: 'Valencia CF', shield: '🦇', league: 'A' },
-      { name: 'Athletic Bilbao', shield: '🦁', league: 'A' },
-      { name: 'Real Sociedad', shield: '🔵', league: 'A' },
-      { name: 'Villarreal CF', shield: '🟡', league: 'A' },
-      { name: 'Real Betis', shield: '🟢', league: 'A' },
-      { name: 'Celta de Vigo', shield: '⚪', league: 'A' },
-      { name: 'Espanyol', shield: '🔵', league: 'A' },
-      { name: 'Getafe CF', shield: '🔵', league: 'A' },
-      { name: 'Granada CF', shield: '🔴', league: 'A' },
-      { name: 'Levante UD', shield: '🔵', league: 'A' },
-      { name: 'Osasuna', shield: '🔴', league: 'A' },
-      { name: 'Deportivo Alavés', shield: '🔵', league: 'A' },
-      { name: 'Mallorca', shield: '🔴', league: 'A' },
-      { name: 'Cádiz CF', shield: '🟡', league: 'A' },
-      { name: 'Elche CF', shield: '🟢', league: 'A' },
-      { name: 'Rayo Vallecano', shield: '⚡', league: 'A' }
-    ];
-
-    // Equipos de Liga B
-    const teamsLigaB = [
-      { name: 'CD Leganés', shield: '🔵', league: 'B' },
-      { name: 'Real Zaragoza', shield: '⚪', league: 'B' },
-      { name: 'Sporting Gijón', shield: '🔴', league: 'B' },
-      { name: 'Real Oviedo', shield: '🔵', league: 'B' },
-      { name: 'CD Tenerife', shield: '⚪', league: 'B' },
-      { name: 'Málaga CF', shield: '🔵', league: 'B' },
-      { name: 'UD Las Palmas', shield: '🟡', league: 'B' },
-      { name: 'SD Eibar', shield: '🔴', league: 'B' },
-      { name: 'CD Mirandés', shield: '🔴', league: 'B' },
-      { name: 'Ponferradina', shield: '⚪', league: 'B' },
-      { name: 'FC Cartagena', shield: '⚪', league: 'B' },
-      { name: 'Real Valladolid', shield: '🟣', league: 'B' },
-      { name: 'Girona FC', shield: '🔴', league: 'B' },
-      { name: 'CD Lugo', shield: '🔴', league: 'B' },
-      { name: 'Albacete BP', shield: '⚪', league: 'B' },
-      { name: 'Burgos CF', shield: '⚪', league: 'B' },
-      { name: 'SD Huesca', shield: '🔵', league: 'B' },
-      { name: 'SD Amorebieta', shield: '⚪', league: 'B' },
-      { name: 'FC Andorra', shield: '🟡', league: 'B' },
-      { name: 'Villarreal B', shield: '🟡', league: 'B' }
-    ];
-
-    const allTeams = [...teamsLigaA, ...teamsLigaB];
-
-    console.log('🏟️  Creando equipos...');
-    
-    for (const teamData of allTeams) {
-      const existing = await Team.findOne({ name: teamData.name });
-      if (!existing) {
-        const team = new Team({
-          ...teamData,
-          budget: Math.floor(Math.random() * 100000) + 50000,
-          isNPC: true
-        });
-        await team.save();
-
-        // Generar plantilla
-        await generateTeamSquad(team._id, teamData.league);
-      }
+    // Verificar si ya existen equipos
+    const existingTeams = await Team.countDocuments();
+    if (existingTeams > 0) {
+      console.log('⚠️ Ya existen equipos en la base de datos');
+      console.log('Si quieres reiniciar, elimina primero todos los equipos');
+      process.exit(0);
     }
 
-    console.log('✅ Equipos creados');
+    console.log('🏗️ Creando equipos de Liga A...');
+    for (const teamName of teamNamesLeagueA) {
+      const team = new Team({
+        name: teamName,
+        league: 'A',
+        budget: Math.floor(Math.random() * 100000) + 50000,
+        isNPC: true
+      });
+      await team.save();
+      await generateSquad(team._id, 70, 85); // Jugadores entre 70-85 overall
+      console.log(`✅ ${teamName} creado`);
+    }
 
-    // Generar calendario de Liga A
-    console.log('📅 Generando calendario Liga A...');
-    await generateLeagueFixtures('A', '2024-25');
+    console.log('🏗️ Creando equipos de Liga B...');
+    for (const teamName of teamNamesLeagueB) {
+      const team = new Team({
+        name: teamName,
+        league: 'B',
+        budget: Math.floor(Math.random() * 50000) + 30000,
+        isNPC: true
+      });
+      await team.save();
+      await generateSquad(team._id, 55, 70); // Jugadores entre 55-70 overall
+      console.log(`✅ ${teamName} creado`);
+    }
 
-    // Generar calendario de Liga B
-    console.log('📅 Generando calendario Liga B...');
-    await generateLeagueFixtures('B', '2024-25');
-
-    console.log('✅ Todo inicializado correctamente');
+    console.log('🎉 ¡Football Manager inicializado correctamente!');
+    console.log(`📊 ${teamNamesLeagueA.length} equipos en Liga A`);
+    console.log(`📊 ${teamNamesLeagueB.length} equipos en Liga B`);
+    
     process.exit(0);
   } catch (error) {
-    console.error('❌ Error:', error);
+    console.error('❌ Error al inicializar:', error);
     process.exit(1);
   }
 }
 
-async function generateTeamSquad(teamId, league) {
+async function generateSquad(teamId, minOverall, maxOverall) {
   const positions = [
-    { pos: 'POR', count: 3 },
-    { pos: 'DEF', count: 8 },
-    { pos: 'MED', count: 8 },
-    { pos: 'DEL', count: 6 }
+    { pos: 'GK', count: 2 },
+    { pos: 'DEF', count: 6 },
+    { pos: 'MID', count: 6 },
+    { pos: 'ATK', count: 4 }
   ];
 
-  const baseOverall = league === 'A' ? 70 : 60;
-  const nationalities = ['🇦🇷', '🇧🇷', '🇪🇸', '🇫🇷', '🇩🇪', '🇮🇹', '🇵🇹', '🇬🇧', '🇺🇾', '🇨🇴'];
-  const firstNames = ['Juan', 'Pedro', 'Luis', 'Carlos', 'Miguel', 'David', 'Jose', 'Diego', 'Mateo', 'Lucas', 'Daniel', 'Rafael', 'Antonio'];
-  const lastNames = ['García', 'Rodríguez', 'González', 'Fernández', 'López', 'Martínez', 'Sánchez', 'Pérez', 'Silva', 'Torres', 'Romero', 'Díaz'];
-
-  for (const posData of positions) {
-    for (let i = 0; i < posData.count; i++) {
-      const overall = Math.floor(Math.random() * 15) + baseOverall;
-
+  for (const { pos, count } of positions) {
+    for (let i = 0; i < count; i++) {
+      const overall = Math.floor(Math.random() * (maxOverall - minOverall + 1)) + minOverall;
+      
       const player = new Player({
-        name: `${firstNames[Math.floor(Math.random() * firstNames.length)]} ${lastNames[Math.floor(Math.random() * lastNames.length)]}`,
-        position: posData.pos,
-        age: Math.floor(Math.random() * 15) + 18,
-        nationality: nationalities[Math.floor(Math.random() * nationalities.length)],
-        overall: overall,
-        pace: Math.min(99, Math.max(40, overall + Math.floor(Math.random() * 20) - 10)),
-        shooting: Math.min(99, Math.max(40, overall + Math.floor(Math.random() * 20) - 10)),
-        passing: Math.min(99, Math.max(40, overall + Math.floor(Math.random() * 20) - 10)),
-        defending: Math.min(99, Math.max(40, overall + Math.floor(Math.random() * 20) - 10)),
-        physical: Math.min(99, Math.max(40, overall + Math.floor(Math.random() * 20) - 10)),
-        currentTeam: teamId
+        name: generateRandomName(),
+        position: pos,
+        age: Math.floor(Math.random() * 13) + 18,
+        overall,
+        pace: generateStat(overall, pos, 'pace'),
+        shooting: generateStat(overall, pos, 'shooting'),
+        passing: generateStat(overall, pos, 'passing'),
+        dribbling: generateStat(overall, pos, 'dribbling'),
+        defending: generateStat(overall, pos, 'defending'),
+        physical: generateStat(overall, pos, 'physical'),
+        teamId,
+        isNPC: true
       });
 
+      player.calculateMarketValue();
       await player.save();
     }
   }
-
-  // Algunos jugadores al mercado
-  const teamPlayers = await Player.find({ currentTeam: teamId });
-  const playersToMarket = teamPlayers.slice(20, 25);
-  
-  for (const player of playersToMarket) {
-    player.onMarket = true;
-    player.transferPrice = Math.floor(player.marketValue * (0.8 + Math.random() * 0.4));
-    await player.save();
-  }
 }
 
-async function generateLeagueFixtures(league, season) {
-  const teams = await Team.find({ league });
+function generateStat(overall, position, statType) {
+  const base = overall + Math.floor(Math.random() * 10) - 5;
   
-  if (teams.length !== 20) {
-    console.log(`⚠️  Liga ${league} no tiene 20 equipos`);
-    return;
+  // Modificadores por posición
+  if (position === 'GK') {
+    if (['defending', 'physical'].includes(statType)) return Math.min(99, base + 5);
+  } else if (position === 'DEF') {
+    if (['defending', 'physical'].includes(statType)) return Math.min(99, base + 8);
+    if (statType === 'shooting') return Math.max(40, base - 10);
+  } else if (position === 'MID') {
+    if (['passing', 'dribbling'].includes(statType)) return Math.min(99, base + 8);
+  } else if (position === 'ATK') {
+    if (['shooting', 'pace', 'dribbling'].includes(statType)) return Math.min(99, base + 8);
+    if (statType === 'defending') return Math.max(30, base - 15);
   }
-
-  // Generar calendario de ida (jornadas 1-19)
-  for (let matchday = 1; matchday <= 19; matchday++) {
-    const matches = [];
-    
-    for (let i = 0; i < 10; i++) {
-      const homeIndex = (matchday + i) % 20;
-      const awayIndex = (20 - i + matchday - 1) % 20;
-      
-      if (homeIndex !== awayIndex) {
-        matches.push({
-          season,
-          matchday,
-          league,
-          homeTeam: teams[homeIndex]._id,
-          awayTeam: teams[awayIndex]._id
-        });
-      }
-    }
-
-    await Match.insertMany(matches);
-  }
-
-  // Generar calendario de vuelta (jornadas 20-38)
-  const firstLegMatches = await Match.find({ season, league, matchday: { $lte: 19 } });
   
-  for (const match of firstLegMatches) {
-    await Match.create({
-      season,
-      matchday: match.matchday + 19,
-      league,
-      homeTeam: match.awayTeam,
-      awayTeam: match.homeTeam
-    });
-  }
+  return Math.max(30, Math.min(99, base));
 }
 
-initializeFootball();
+function generateRandomName() {
+  const firstNames = [
+    'Carlos', 'Juan', 'Diego', 'Luis', 'Pedro', 'Miguel', 'Andrés', 'Fernando', 
+    'Jorge', 'Ricardo', 'Manuel', 'Antonio', 'José', 'Francisco', 'Rafael',
+    'Javier', 'Sergio', 'Pablo', 'Daniel', 'Alejandro', 'David', 'Ángel',
+    'Roberto', 'Mario', 'Alberto', 'Cristian', 'Iván', 'Adrián', 'Rubén'
+  ];
+  
+  const lastNames = [
+    'García', 'Martínez', 'López', 'González', 'Rodríguez', 'Pérez', 'Sánchez',
+    'Ramírez', 'Torres', 'Flores', 'Rivera', 'Gómez', 'Díaz', 'Cruz', 'Morales',
+    'Reyes', 'Jiménez', 'Hernández', 'Ruiz', 'Vargas', 'Castro', 'Ortiz',
+    'Silva', 'Ramos', 'Medina', 'Romero', 'Delgado', 'Aguilar', 'Vega'
+  ];
+
+  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
+  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
+  
+  return `${firstName} ${lastName}`;
+}
+
+initFootball();

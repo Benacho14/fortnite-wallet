@@ -8,76 +8,78 @@ const playerSchema = new mongoose.Schema({
   },
   position: {
     type: String,
-    enum: ['POR', 'DEF', 'MED', 'DEL'],
+    enum: ['GK', 'DEF', 'MID', 'ATK'],
     required: true
   },
   age: {
     type: Number,
+    required: true,
     min: 16,
-    max: 40,
-    required: true
+    max: 40
   },
-  nationality: {
-    type: String,
-    default: '🌍'
-  },
-  // Stats del jugador (0-100)
+  // Stats estilo FIFA
   overall: {
     type: Number,
-    default: 60
+    required: true,
+    min: 40,
+    max: 99
   },
-  pace: {
-    type: Number,
-    default: 60
-  },
-  shooting: {
-    type: Number,
-    default: 60
-  },
-  passing: {
-    type: Number,
-    default: 60
-  },
-  defending: {
-    type: Number,
-    default: 60
-  },
-  physical: {
-    type: Number,
-    default: 60
-  },
-  // Valor del jugador
+  pace: { type: Number, min: 1, max: 99 },
+  shooting: { type: Number, min: 1, max: 99 },
+  passing: { type: Number, min: 1, max: 99 },
+  dribbling: { type: Number, min: 1, max: 99 },
+  defending: { type: Number, min: 1, max: 99 },
+  physical: { type: Number, min: 1, max: 99 },
+  
+  // Valor de mercado
   marketValue: {
     type: Number,
-    required: true
+    required: true,
+    min: 0
   },
-  currentTeam: {
+  
+  // Contrato
+  contractYears: {
+    type: Number,
+    default: 3,
+    min: 0,
+    max: 5
+  },
+  
+  // Equipo al que pertenece
+  teamId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team',
     default: null
   },
+  
+  // Estado en el mercado
   onMarket: {
     type: Boolean,
     default: false
   },
-  transferPrice: {
+  askingPrice: {
     type: Number,
     default: 0
   },
-  createdAt: {
-    type: Date,
-    default: Date.now
+  
+  // Si es jugador NPC o pertenece a un usuario
+  isNPC: {
+    type: Boolean,
+    default: true
   }
+}, {
+  timestamps: true
 });
 
-// Calcular valor de mercado basado en stats
-playerSchema.pre('save', function(next) {
-  if (this.isNew || this.isModified('overall')) {
-    const baseValue = 1000;
-    const multiplier = Math.pow(1.15, this.overall - 50);
-    this.marketValue = Math.round(baseValue * multiplier);
-  }
-  next();
-});
+// Método para calcular valor de mercado basado en stats
+playerSchema.methods.calculateMarketValue = function() {
+  const baseValue = 1000;
+  const overallMultiplier = this.overall * 100;
+  const ageModifier = this.age < 24 ? 1.2 : this.age > 30 ? 0.8 : 1;
+  
+  this.marketValue = Math.round((baseValue + overallMultiplier) * ageModifier);
+  return this.marketValue;
+};
 
 module.exports = mongoose.model('Player', playerSchema);
