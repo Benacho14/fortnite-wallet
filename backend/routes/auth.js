@@ -17,10 +17,8 @@ router.post('/register', async (req, res) => {
       return res.status(400).json({ error: 'Todos los campos son requeridos' });
     }
 
-    const users = readUsers();
-
     // Verificar si el usuario ya existe
-    const existingUser = users.find(u => u.email === email);
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
       return res.status(400).json({ error: 'El usuario ya existe' });
     }
@@ -29,25 +27,23 @@ router.post('/register', async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Crear nuevo usuario
-    const newUser = {
-      id: Date.now().toString(),
+    const newUser = new User({
       email,
       username,
       password: hashedPassword,
       balance: 1000,
       isAdmin: false
-    };
+    });
 
-    users.push(newUser);
-    writeUsers(users);
+    await newUser.save();
 
     // Generar token
-    const token = jwt.sign({ userId: newUser.id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: newUser._id, email: newUser.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: newUser.id,
+        id: newUser._id,
         email: newUser.email,
         username: newUser.username,
         balance: newUser.balance,
@@ -69,10 +65,8 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Email y contraseña requeridos' });
     }
 
-    const users = readUsers();
-
     // Buscar usuario
-    const user = users.find(u => u.email === email);
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ error: 'Credenciales inválidas' });
     }
@@ -84,12 +78,12 @@ router.post('/login', async (req, res) => {
     }
 
     // Generar token
-    const token = jwt.sign({ userId: user.id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
+    const token = jwt.sign({ userId: user._id, email: user.email }, SECRET_KEY, { expiresIn: '7d' });
 
     res.json({
       token,
       user: {
-        id: user.id,
+        id: user._id,
         email: user.email,
         username: user.username,
         balance: user.balance,
@@ -105,10 +99,8 @@ router.post('/login', async (req, res) => {
 // Ruta para obtener datos del usuario autenticado
 router.get('/me', authMiddleware, async (req, res) => {
   try {
-    const users = readUsers();
-    
     // Buscar el usuario por ID (viene del token decodificado)
-    const user = users.find(u => u.id === req.userId);
+    const user = await User.findById(req.userId).select('-password');
     
     if (!user) {
       return res.status(404).json({ error: 'Usuario no encontrado' });
@@ -117,7 +109,7 @@ router.get('/me', authMiddleware, async (req, res) => {
     // Devolver datos del usuario (sin la contraseña)
     res.json({ 
       user: {
-        id: user.id,
+        id: user._id,
         username: user.username,
         email: user.email,
         balance: user.balance,
@@ -134,27 +126,23 @@ router.get('/me', authMiddleware, async (req, res) => {
 // Crear usuario admin (opcional - para testing)
 router.post('/create-admin', async (req, res) => {
   try {
-    const users = readUsers();
-    
     // Verificar si ya existe el admin
-    const existingAdmin = users.find(u => u.email === 'admin@fortnite.com');
+    const existingAdmin = await User.findOne({ email: 'admin@fortnite.com' });
     if (existingAdmin) {
       return res.status(400).json({ error: 'El usuario admin ya existe' });
     }
 
     const hashedPassword = await bcrypt.hash('admin123', 10);
 
-    const adminUser = {
-      id: Date.now().toString(),
+    const adminUser = new User({
       email: 'admin@fortnite.com',
       username: 'Admin Tester',
       password: hashedPassword,
       balance: 999999,
       isAdmin: true
-    };
+    });
 
-    users.push(adminUser);
-    writeUsers(users);
+    await adminUser.save();
 
     res.json({
       success: true,
