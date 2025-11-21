@@ -38,5 +38,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🎮 Fortnite Wallet Server running on port ${PORT}`);
 });
-
-module.exports = router;
