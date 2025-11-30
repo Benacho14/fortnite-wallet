@@ -1,0 +1,121 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum TransactionType {
+  TRANSFER_SENT
+  TRANSFER_RECEIVED
+  PURCHASE
+  SALE
+  ADMIN_ADJUSTMENT
+  REVERSAL
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String
+  role      UserRole @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  account              Account?
+  transactionsSent     Transaction[] @relation("TransactionSender")
+  transactionsReceived Transaction[] @relation("TransactionReceiver")
+  stores               Store[]
+  orders               Order[]
+
+  @@map("users")
+}
+
+model Account {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  balance   Decimal  @default(0) @db.Decimal(15, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id          String          @id @default(uuid())
+  amount      Decimal         @db.Decimal(15, 2)
+  type        TransactionType
+  description String?
+  senderId    String?
+  receiverId  String?
+  orderId     String?         @unique
+  metadata    Json?
+  createdAt   DateTime        @default(now())
+
+  sender   User?  @relation("TransactionSender", fields: [senderId], references: [id])
+  receiver User?  @relation("TransactionReceiver", fields: [receiverId], references: [id])
+  order    Order? @relation(fields: [orderId], references: [id])
+
+  @@index([senderId])
+  @@index([receiverId])
+  @@index([createdAt])
+  @@map("transactions")
+}
+
+model Store {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  products Product[]
+
+  @@map("stores")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  price       Decimal  @db.Decimal(15, 2)
+  stock       Int      @default(0)
+  storeId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  store  Store   @relation(fields: [storeId], references: [id], onDelete: Cascade)
+  orders Order[]
+
+  @@map("products")
+}
+
+model Order {
+  id         String   @id @default(uuid())
+  quantity   Int
+  totalPrice Decimal  @db.Decimal(15, 2)
+  buyerId    String
+  productId  String
+  createdAt  DateTime @default(now())
+
+  buyer       User         @relation(fields: [buyerId], references: [id])
+  product     Product      @relation(fields: [productId], references: [id])
+  transaction Transaction?
+
+  @@map("orders")
+}

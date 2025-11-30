@@ -1,0 +1,34 @@
+services:
+  # Backend API
+  - type: web
+    name: wallet-backend
+    env: node
+    region: oregon
+    buildCommand: cd backend && npm install && npx prisma generate && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: NODE_ENV
+        value: production
+      - key: FRONTEND_URL
+        value: https://wallet-frontend.onrender.com
+
+  # Frontend
+  - type: web
+    name: wallet-frontend
+    env: static
+    region: oregon
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: frontend/dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://wallet-backend.onrender.com/api
+
+databases:
+  - name: wallet-db
+    databaseName: wallet_virtual
+    user: wallet_user
+    region: oregon

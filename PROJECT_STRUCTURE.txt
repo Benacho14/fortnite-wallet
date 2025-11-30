@@ -1,0 +1,146 @@
+wallet_def/
+│
+├── 📄 README.md                     # Complete installation & usage guide
+├── 📄 QUICKSTART.md                 # 5-minute setup guide
+├── 📄 ARCHITECTURE.md               # Transaction consistency explanation
+├── 📄 PROJECT_SUMMARY.md            # Project overview & status
+├── 📄 HOW_TO_PACKAGE.md             # Instructions to package project
+├── 📄 docker-compose.yml            # PostgreSQL container config
+├── 📄 .gitignore                    # Git ignore rules
+│
+├── 🔧 backend/                      # Node.js + TypeScript API
+│   ├── 📄 package.json              # Dependencies & scripts
+│   ├── 📄 tsconfig.json             # TypeScript config
+│   ├── 📄 jest.config.js            # Test configuration
+│   ├── 📄 .env.example              # Environment variables template
+│   ├── 📄 .env                      # Actual environment config (gitignored)
+│   │
+│   ├── 📁 prisma/                   # Database ORM
+│   │   ├── 📄 schema.prisma         # Database schema (8 models)
+│   │   ├── 📄 seed.ts               # Seed data script
+│   │   └── 📁 migrations/           # Database migrations
+│   │
+│   └── 📁 src/
+│       ├── 📄 index.ts              # Server entry point (Express + Socket.IO)
+│       │
+│       ├── 📁 config/               # Configuration
+│       │   ├── 📄 env.ts            # Environment variables
+│       │   └── 📄 database.ts       # Prisma client instance
+│       │
+│       ├── 📁 middleware/           # Express middleware
+│       │   ├── 📄 auth.ts           # JWT authentication & authorization
+│       │   ├── 📄 errorHandler.ts   # Global error handler
+│       │   └── 📄 rateLimiter.ts    # Rate limiting configs
+│       │
+│       ├── 📁 routes/               # API endpoints (7 routers)
+│       │   ├── 📄 auth.ts           # POST /register, /login
+│       │   ├── 📄 account.ts        # GET /balance, /transactions, /details
+│       │   ├── 📄 transfer.ts       # POST /transfer
+│       │   ├── 📄 store.ts          # GET /stores, POST /stores
+│       │   ├── 📄 product.ts        # GET /products, POST /products
+│       │   ├── 📄 order.ts          # POST /buy
+│       │   └── 📄 admin.ts          # Admin endpoints (users, transactions, reversal)
+│       │
+│       ├── 📁 services/             # Business logic (ACID transactions)
+│       │   ├── 📄 authService.ts    # Register, login logic
+│       │   ├── 📄 accountService.ts # Balance, transaction history
+│       │   ├── 📄 transferService.ts # Money transfer with transaction
+│       │   ├── 📄 storeService.ts   # Store, product, purchase logic
+│       │   └── 📄 adminService.ts   # Admin operations, reversal
+│       │
+│       ├── 📁 validators/           # Input validation
+│       │   └── 📄 schemas.ts        # Zod validation schemas
+│       │
+│       ├── 📁 utils/                # Utilities
+│       │   ├── 📄 jwt.ts            # JWT generation & verification
+│       │   └── 📄 websocket.ts      # Socket.IO initialization & helpers
+│       │
+│       └── 📁 types/                # TypeScript types
+│           └── 📄 express.d.ts      # Express request type augmentation
+│
+├── 🎨 frontend/                     # React + TypeScript UI
+│   ├── 📄 package.json              # Dependencies & scripts
+│   ├── 📄 tsconfig.json             # TypeScript config
+│   ├── 📄 tsconfig.node.json        # Node-specific TS config
+│   ├── 📄 vite.config.ts            # Vite bundler config
+│   ├── 📄 tailwind.config.js        # Tailwind CSS config (dark theme)
+│   ├── 📄 postcss.config.js         # PostCSS config
+│   ├── 📄 index.html                # HTML entry point
+│   │
+│   └── 📁 src/
+│       ├── 📄 main.tsx              # React app entry
+│       ├── 📄 App.tsx               # Router & providers
+│       ├── 📄 index.css             # Tailwind imports & animations
+│       │
+│       ├── 📁 components/           # Reusable UI components
+│       │   ├── 📄 Layout.tsx        # Navigation & page wrapper
+│       │   ├── 📄 ProtectedRoute.tsx # Auth guard component
+│       │   └── 📄 Notification.tsx  # WebSocket toast notifications
+│       │
+│       ├── 📁 contexts/             # React contexts
+│       │   ├── 📄 AuthContext.tsx   # Authentication state
+│       │   └── 📄 WebSocketContext.tsx # Socket.IO connection
+│       │
+│       ├── 📁 pages/                # Page components (5 pages)
+│       │   ├── 📄 Login.tsx         # Login page
+│       │   ├── 📄 Register.tsx      # Registration page
+│       │   ├── 📄 Dashboard.tsx     # Balance + transfer form
+│       │   ├── 📄 Marketplace.tsx   # Products, stores, create
+│       │   └── 📄 Admin.tsx         # Admin panel (users, transactions, orders)
+│       │
+│       ├── 📁 services/             # API client
+│       │   └── 📄 api.ts            # Fetch wrapper with all endpoints
+│       │
+│       └── 📁 types/                # TypeScript types
+│           └── 📄 index.ts          # Shared type definitions
+│
+└── 🧪 tests/                        # Integration tests (Jest + Supertest)
+    ├── 📄 auth.test.ts              # 5 tests: register, login, protected routes
+    ├── 📄 transfer.test.ts          # 4 tests: successful, insufficient balance, etc.
+    ├── 📄 purchase.test.ts          # 3 tests: buy product, invalid quantity
+    └── 📄 admin.test.ts             # 4 tests: view data, reverse transaction
+
+
+═══════════════════════════════════════════════════════════════════════════════
+KEY METRICS
+═══════════════════════════════════════════════════════════════════════════════
+Backend Files:        25 TypeScript files
+Frontend Files:       15 TypeScript/TSX files
+Tests:               4 test suites (16+ tests)
+API Endpoints:       17 endpoints across 7 routers
+Database Models:     8 models (User, Account, Transaction, Store, Product, Order, + enums)
+Total Lines of Code: ~4,500 lines
+Documentation:       5 markdown files
+
+═══════════════════════════════════════════════════════════════════════════════
+TECH STACK
+═══════════════════════════════════════════════════════════════════════════════
+Backend:   Node.js 18+, TypeScript, Express, Prisma, PostgreSQL, Socket.IO
+Frontend:  React 18, TypeScript, Vite, Tailwind CSS, React Router
+Auth:      JWT + bcrypt
+Validation: Zod
+Testing:   Jest + Supertest
+Container: Docker (PostgreSQL)
+
+═══════════════════════════════════════════════════════════════════════════════
+SECURITY FEATURES
+═══════════════════════════════════════════════════════════════════════════════
+✅ Password hashing (bcrypt)
+✅ JWT authentication
+✅ Role-based access control (USER/ADMIN)
+✅ Rate limiting (auth, transfer, API)
+✅ Input validation (Zod schemas)
+✅ SQL injection prevention (Prisma)
+✅ CORS configuration
+✅ ACID transactions for consistency
+
+═══════════════════════════════════════════════════════════════════════════════
+REAL-TIME FEATURES
+═══════════════════════════════════════════════════════════════════════════════
+✅ WebSocket notifications
+✅ Transfer sent/received alerts
+✅ Purchase/sale notifications
+✅ Transaction reversal alerts
+✅ Live balance updates
+
+═══════════════════════════════════════════════════════════════════════════════
