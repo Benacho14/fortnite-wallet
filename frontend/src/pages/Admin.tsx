@@ -160,8 +160,8 @@ export function Admin() {
                     ${parseFloat(tx.amount).toFixed(2)}
                   </p>
                   {(tx.type === 'TRANSFER_SENT' || tx.type === 'TRANSFER_RECEIVED') &&
-                    tx.senderId &&
-                    tx.receiverId && (
+                    tx.sender &&
+                    tx.receiver && (
                       <button
                         onClick={() => handleReverseTransaction(tx.id)}
                         className="mt-2 px-3 py-1 bg-red-600 hover:bg-red-700 rounded text-xs"
