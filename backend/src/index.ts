@@ -14,6 +14,7 @@ import storeRoutes from './routes/store';
 import productRoutes from './routes/product';
 import orderRoutes from './routes/order';
 import adminRoutes from './routes/admin';
+import setupRoutes from './routes/setup';
 
 const app = express();
 const server = createServer(app);
@@ -42,6 +43,7 @@ app.use('/api/stores', storeRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/setup', setupRoutes);
 
 // Error handler (must be last)
 app.use(errorHandler);
