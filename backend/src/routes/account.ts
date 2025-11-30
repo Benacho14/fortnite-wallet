@@ -32,4 +32,26 @@ router.get('/details', authenticate, async (req, res, next) => {
   }
 });
 
+router.get('/users', authenticate, async (req, res, next) => {
+  try {
+    const prisma = (await import('../config/database')).default;
+    const users = await prisma.user.findMany({
+      where: {
+        id: { not: req.user!.userId },
+      },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+      },
+      orderBy: {
+        name: 'asc',
+      },
+    });
+    res.json(users);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

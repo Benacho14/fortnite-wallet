@@ -57,6 +57,13 @@ export const api = {
     return handleResponse<any>(response);
   },
 
+  getUsers: async (): Promise<Array<{ id: string; name: string; email: string }>> => {
+    const response = await fetch(`${API_URL}/account/users`, {
+      headers: getAuthHeader(),
+    });
+    return handleResponse<Array<{ id: string; name: string; email: string }>>(response);
+  },
+
   // Transfer
   transfer: async (receiverEmail: string, amount: number, description?: string): Promise<any> => {
     const response = await fetch(`${API_URL}/transfer`, {
@@ -82,6 +89,23 @@ export const api = {
     return handleResponse<Store>(response);
   },
 
+  updateStore: async (id: string, name: string, description?: string): Promise<Store> => {
+    const response = await fetch(`${API_URL}/stores/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ name, description }),
+    });
+    return handleResponse<Store>(response);
+  },
+
+  deleteStore: async (id: string): Promise<{ message: string }> => {
+    const response = await fetch(`${API_URL}/stores/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeader(),
+    });
+    return handleResponse<{ message: string }>(response);
+  },
+
   // Products
   getProducts: async (): Promise<Product[]> => {
     const response = await fetch(`${API_URL}/products`);
@@ -95,6 +119,23 @@ export const api = {
       body: JSON.stringify({ storeId, name, price, stock, description }),
     });
     return handleResponse<Product>(response);
+  },
+
+  updateProduct: async (id: string, name: string, price: number, stock: number, description?: string): Promise<Product> => {
+    const response = await fetch(`${API_URL}/products/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+      body: JSON.stringify({ name, price, stock, description }),
+    });
+    return handleResponse<Product>(response);
+  },
+
+  deleteProduct: async (id: string): Promise<{ message: string }> => {
+    const response = await fetch(`${API_URL}/products/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeader(),
+    });
+    return handleResponse<{ message: string }>(response);
   },
 
   // Orders
