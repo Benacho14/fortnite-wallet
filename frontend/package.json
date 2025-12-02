@@ -4,7 +4,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && node -e \"const fs=require('fs');const path=require('path');const src='public/_redirects';const dest='dist/_redirects';if(!fs.existsSync('dist'))fs.mkdirSync('dist',{recursive:true});fs.copyFileSync(src,dest);console.log('_redirects copied to dist');\"",
     "preview": "vite preview"
   },
   "dependencies": {
